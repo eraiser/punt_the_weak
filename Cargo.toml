@@ -1,0 +1,7 @@
+[package]
+name = "punt_the_weak"
+version = "0.1.0"
+authors = ["eraiser <krotttendorfer@hotmail.de>"]
+edition = "2018"
+
+[dependencies]
