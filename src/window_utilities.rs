@@ -3,11 +3,12 @@ use glutin::{ContextWrapper, PossiblyCurrent};
 use glutin::event_loop::EventLoop;
 use glutin::window::Window;
 
-pub fn initialize_window() -> (EventLoop<()>,ContextWrapper<PossiblyCurrent,Window>)
+
+pub fn initialize_window(vsync: bool) -> (EventLoop<()>,ContextWrapper<PossiblyCurrent,Window>)
 {
-    let event_loop = glutin::event_loop::EventLoop::<()>::new_user_event();
+    let event_loop = glutin::event_loop::EventLoop::new_user_event();
     let wb = glutin::window::WindowBuilder::new().with_title("A fantastic window!");
-    let context = glutin::ContextBuilder::new().build_windowed(wb, &event_loop).unwrap();
+    let context = glutin::ContextBuilder::new().with_vsync(vsync).build_windowed(wb, &event_loop).unwrap();
     
     // It is essential to make the context current before calling `gl::load_with`.
     let windowed_context = unsafe { context.make_current().unwrap() };
