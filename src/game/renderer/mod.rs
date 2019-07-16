@@ -26,9 +26,8 @@ impl Renderer {
     }
     pub fn set_mvp(&self,m_matrix: Matrix4<f32>,v_matrix: Matrix4<f32>)
     {
-        use cgmath::Matrix;
         unsafe {
-            gl::UniformMatrix4fv(self.mvp_location, 1, gl::FALSE, cgmath::conv::array4x4((self.perspective_matrix*v_matrix*m_matrix)).as_ptr() as *const GLfloat)
+            gl::UniformMatrix4fv(self.mvp_location, 1, gl::FALSE, cgmath::conv::array4x4(self.perspective_matrix*v_matrix*m_matrix).as_ptr() as *const GLfloat)
         }
     }
 }
@@ -53,10 +52,10 @@ pub fn init_renderer() -> Renderer {
 
     let perspective_matrix:Matrix4<f32> = {
             cgmath::perspective(
-                cgmath::Rad(std::f32::consts::PI/4.0),
-                4.0/3.0,
-                0.001,
-                10000.0,
+                cgmath::Rad(std::f32::consts::PI/2.1),
+                1920.0/1080.0,
+                0.1,
+                1000.0,
             )
     };
 

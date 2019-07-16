@@ -1,16 +1,12 @@
 extern crate gl;
 extern crate glutin;
 
-use std::path::MAIN_SEPARATOR;
-
 mod window_utilities;
-
 mod game;
 
-/*
-SETTINGS
-*/
-static VSYNC: bool = true;
+mod settings;
+
+use settings::*;
 
 fn main() {
     let (event_loop, windowed_context)
@@ -18,6 +14,9 @@ fn main() {
 
     let mut game = game::new_game();
     game.load_scene();
+
+    let mut window_size = windowed_context.window().inner_size();
+
 
 
     use std::time::{Duration, Instant};
@@ -30,11 +29,12 @@ fn main() {
     let game_time = Instant::now();
     let mut previous = game_time.elapsed();
     let mut lag = Duration::from_micros(0);
-    use game::MCS_PER_UPDATE;
 
 
     use glutin::event_loop::ControlFlow;
-    use glutin::event::{WindowEvent, Event};
+    use glutin::event::{DeviceEvent, WindowEvent, Event};
+
+    //windowed_context.window().set_decorations(false);
 
     event_loop.run(move |event, _, control_flow| {
         match event {
@@ -44,7 +44,7 @@ fn main() {
                         windowed_context.window().hidpi_factor();
                     windowed_context
                         .resize(logical_size.to_physical(dpi_factor));
-
+                    window_size = *logical_size;
                     unsafe {
                         gl::Viewport(0, 0, logical_size.width as i32, logical_size.height as i32);
                     }
@@ -59,9 +59,18 @@ fn main() {
                 _ => (),
             },
 
+
+            Event::DeviceEvent {ref event, .. } => match event {
+                DeviceEvent::MouseMotion { delta} => {
+                    let x_movement = delta.0/window_size.width;
+                    let y_movement = delta.1/window_size.height;
+                    game.handle_cursor_movement(x_movement as f32,y_movement as f32);
+                }
+                _ => (),
+            }
+
             Event::EventsCleared => {
                 if control_flow != &ControlFlow::Exit {
-
 
                     let current = game_time.elapsed();
                     let elapsed = current - previous;
@@ -69,18 +78,21 @@ fn main() {
                     lag += elapsed;
 
                     while lag >= MCS_PER_UPDATE {
-                        game.update();
+                        game.update(windowed_context.window());
                         lag -= MCS_PER_UPDATE;
-                        update_c+=1;
+                        update_c += 1;
                     }
 
-                    frame_c+=1;
+                    frame_c += 1;
+
+
                     if now.elapsed() >= one_sec {
-                        println!("frames/sec: {}",frame_c);
-                        println!("updates/sec: {}\n",update_c);
+                        println!("frames/sec: {}", frame_c);
+                        println!("updates/sec: {}\n", update_c);
                         now = Instant::now();
                         frame_c = 0;
                         update_c = 0;
+
                     }
 
                     game.draw((lag.as_micros() as f32) / (MCS_PER_UPDATE.as_micros() as f32));
