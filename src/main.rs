@@ -21,10 +21,7 @@ fn main() {
 
     use std::time::{Duration, Instant};
 
-    let mut now = Instant::now();
-    let one_sec = Duration::from_secs(1);
-    let mut frame_c = 0;
-    let mut update_c = 0;
+    let mut fps_ups_counter = window_utilities::new_fps_ups_counter();
 
     let game_time = Instant::now();
     let mut previous = game_time.elapsed();
@@ -80,20 +77,11 @@ fn main() {
                     while lag >= MCS_PER_UPDATE {
                         game.update(windowed_context.window());
                         lag -= MCS_PER_UPDATE;
-                        update_c += 1;
+                        fps_ups_counter.advance_ups();
                     }
 
-                    frame_c += 1;
-
-
-                    if now.elapsed() >= one_sec {
-                        println!("frames/sec: {}", frame_c);
-                        println!("updates/sec: {}\n", update_c);
-                        now = Instant::now();
-                        frame_c = 0;
-                        update_c = 0;
-
-                    }
+                    fps_ups_counter.advance_fps();
+                    fps_ups_counter.display_if_one_sec_over();
 
                     game.draw((lag.as_micros() as f32) / (MCS_PER_UPDATE.as_micros() as f32));
                     windowed_context.swap_buffers().unwrap();
