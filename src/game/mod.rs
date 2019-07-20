@@ -129,10 +129,12 @@ impl Game {
                 GameMode::Playing => {
                     window.set_cursor_grab(true).unwrap();
                     window.set_cursor_visible(false);
+                    self.controls.reset();
                 }
                 GameMode::Menu => {
                     window.set_cursor_grab(false).unwrap();
                     window.set_cursor_visible(true);
+                    self.controls.reset();
                 }
             }
             self.game_mode_changed = false;

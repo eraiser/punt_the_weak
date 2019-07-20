@@ -46,26 +46,12 @@ impl Camera {
 
     pub fn move_dir(&mut self, dir: Option<Vector3<f32>>) {
 
-
         if let Some(d) = self.move_direction {
             self.position += d;
         }
 
         self.move_direction = dir;
 
-
-        /*
-        match self.interpolated_step {
-            Some(is) => {
-                self.position+=is;
-                self.interpolated_step = None;
-            },
-            None =>()
-        }
-        */
-
-
-        
     }
 
     pub fn rotate_x(&mut self, angle: f32) {
@@ -104,11 +90,6 @@ impl Camera {
     pub fn get_speed(&self) -> f32 { self.speed }
     pub fn get_position(&self) -> Point3<f32> {self.position}
 
-    /*
-    pub fn starts_moving(&mut self){self.moving=true}
-    pub fn stops_moving(&mut self){self.moving=false}
-    pub fn is_moving(&mut self) -> bool {self.moving}
-    */
 }
 
 impl std::fmt::Display for Camera {

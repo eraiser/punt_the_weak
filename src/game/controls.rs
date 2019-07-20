@@ -18,13 +18,24 @@ pub fn new_controls() -> Controls {
     }
 }
 
-use cgmath::{Vector3, Matrix3, Rad};
-use cgmath::prelude::InnerSpace;
 
+use cgmath::prelude::InnerSpace;
+use cgmath::{Matrix3, Rad, Vector3};
 impl Controls {
-    pub fn get_movement_vec(&self, look_dir: Vector3<f32>, speed: f32)
-                            -> Option<Vector3<f32>> {
-        let mut v = Vector3 { x: 0.0, y: 0.0, z: 0.0 };
+    pub fn reset(&mut self) {
+        self.forward = false;
+        self.backward = false;
+        self.left = false;
+        self.right = false;
+        self.up = false;
+        self.down = false;
+    }
+    pub fn get_movement_vec(&self, look_dir: Vector3<f32>, speed: f32) -> Option<Vector3<f32>> {
+        let mut v = Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        };
 
         let mut norm = look_dir;
         norm.y = 0.0;

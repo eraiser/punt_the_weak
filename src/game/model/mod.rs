@@ -55,8 +55,9 @@ impl Model {
         self.motion.movement_vector = Some(vec);
     }
 
-
-    pub fn scale(&mut self, scale: f32) { self.scale *= scale; }
+    pub fn scale(&mut self, scale: f32) {
+        self.scale *= scale;
+    }
     pub fn translate(&mut self, translate: Vector3<f32>) {
         self.translation += translate;
     }
@@ -73,7 +74,8 @@ impl Model {
         if let Some(v) = self.motion.movement_vector {
             self.translation += v / TICKS_PER_SECOND as f32;
         }
-        self.model_matrix = Matrix4::from_translation(self.translation) * self.rotation * self.scale;
+        self.model_matrix =
+            Matrix4::from_translation(self.translation) * self.rotation * self.scale;
     }
     pub fn get_model_matrix(&self) -> Matrix4<f32> {
         self.model_matrix
@@ -87,35 +89,33 @@ impl Model {
         );
 
         if let Some(v) = self.motion.movement_vector {
-            return Matrix4::from_translation(self.translation + ((v / TICKS_PER_SECOND as f32) * *i_v)) * self.rotation * rotation * self.scale;
+            return Matrix4::from_translation(
+                self.translation + ((v / TICKS_PER_SECOND as f32) * *i_v),
+            ) * self.rotation * rotation * self.scale;
         }
         Matrix4::from_translation(self.translation) * self.rotation * rotation * self.scale
     }
 
-    pub fn get_translation(&self) -> Vector3<f32> { self.translation }
-}
-
-impl std::fmt::Display for Model {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(modelmatrix {:?}", self.model_matrix)
+    pub fn get_translation(&self) -> Vector3<f32> {
+        self.translation
     }
 }
 
 use gl::types::*;
 
 // Vertex data
-static VERTEX_DATA_2D: [GLfloat; 6] = [0.0, 0.5,
-    0.5, -0.5,
-    -0.5, -0.5];
+static VERTEX_DATA_2D: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
 
-static VERTEX_DATA_3D: [GLfloat; 9] = [0.0, 0.5, 0.0,
-    0.5, -0.5, 0.0,
-    -0.5, -0.5, 0.0];
+static VERTEX_DATA_3D: [GLfloat; 9] = [0.0, 0.5, 0.0, 0.5, -0.5, 0.0, -0.5, -0.5, 0.0];
 
 pub fn triangle() -> Model {
     Model {
         mesh: mesh::new_static_3d_mesh(VERTEX_DATA_3D.to_vec()),
-        translation: Vector3 { x: 0.0, y: 0.0, z: 0.0 },
+        translation: Vector3 {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        },
         rotation: cgmath::SquareMatrix::identity(),
         scale: 1.0,
         model_matrix: cgmath::SquareMatrix::identity(),
