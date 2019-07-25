@@ -55,8 +55,8 @@ pub fn generate_rotation_matrix(x_rotation_speed: Option<Rad<f32>>,
 }
 
 pub fn generate_int_rotation_matrix(x_rotation_speed: Option<Rad<f32>>,
-                                y_rotation_speed: Option<Rad<f32>>,
-                                z_rotation_speed: Option<Rad<f32>>,
+                                    y_rotation_speed: Option<Rad<f32>>,
+                                    z_rotation_speed: Option<Rad<f32>>,
                                     i_v: &f32) -> Matrix4<f32>{
     let tps = TICKS_PER_SECOND as f32;
     match z_rotation_speed {

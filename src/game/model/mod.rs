@@ -1,4 +1,5 @@
-mod mesh;
+
+pub mod mesh;
 pub mod motion;
 
 mod rotation_utility;
@@ -14,12 +15,10 @@ pub struct Model {
     scale: f32,
     model_matrix: Matrix4<f32>,
     motion: motion::Motion,
+    texture: gl::types::GLuint,
 }
 
 impl Model {
-    pub fn draw_2d(&self) {
-        self.mesh.draw_2d();
-    }
     pub fn draw_3d(&self) {
         self.mesh.draw_3d();
     }
@@ -91,7 +90,9 @@ impl Model {
         if let Some(v) = self.motion.movement_vector {
             return Matrix4::from_translation(
                 self.translation + ((v / TICKS_PER_SECOND as f32) * *i_v),
-            ) * self.rotation * rotation * self.scale;
+            ) * self.rotation
+                * rotation
+                * self.scale;
         }
         Matrix4::from_translation(self.translation) * self.rotation * rotation * self.scale
     }
@@ -99,18 +100,20 @@ impl Model {
     pub fn get_translation(&self) -> Vector3<f32> {
         self.translation
     }
+
+    pub fn get_texture(&self) -> gl::types::GLuint {
+        self.texture
+    }
 }
 
-use gl::types::*;
-
-// Vertex data
-static VERTEX_DATA_2D: [GLfloat; 6] = [0.0, 0.5, 0.5, -0.5, -0.5, -0.5];
-
-static VERTEX_DATA_3D: [GLfloat; 9] = [0.0, 0.5, 0.0, 0.5, -0.5, 0.0, -0.5, -0.5, 0.0];
+mod example;
 
 pub fn triangle() -> Model {
+
+    let mesh = crate::game::loader::load_collada_mesh(include_str!("untitled.dae"));
+
     Model {
-        mesh: mesh::new_static_3d_mesh(VERTEX_DATA_3D.to_vec()),
+        mesh,
         translation: Vector3 {
             x: 0.0,
             y: 0.0,
@@ -120,5 +123,6 @@ pub fn triangle() -> Model {
         scale: 1.0,
         model_matrix: cgmath::SquareMatrix::identity(),
         motion: motion::new_motion(),
+        texture: crate::game::loader::load_texture("./src/game/model/Untitled.001.png")
     }
 }

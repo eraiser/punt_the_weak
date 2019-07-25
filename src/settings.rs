@@ -2,7 +2,7 @@
 /*
 SETTINGS
 */
-pub static VSYNC: bool = true;
+pub static VSYNC: bool = false;
 
 use std::time::Duration;
 pub static TICKS_PER_SECOND: u64 = 25;

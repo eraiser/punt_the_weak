@@ -1,8 +1,8 @@
-
+use crate::settings;
 use glutin::event_loop::EventLoop;
 use glutin::window::Window;
 use glutin::{ContextWrapper, PossiblyCurrent};
-use crate::settings;
+
 
 
 pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<PossiblyCurrent, Window>) {
@@ -19,6 +19,10 @@ pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<Possibly
     // Load the OpenGL function pointers
     gl::load_with(|symbol| windowed_context.get_proc_address(symbol) as *const _);
 
+    unsafe {
+        gl::Enable(gl::DEPTH_TEST);
+        gl::DepthFunc(gl::LESS);
+    }
     (event_loop, windowed_context)
 }
 
@@ -33,10 +37,10 @@ pub struct FpsUpsCounter {
 }
 
 pub fn new_fps_ups_counter() -> FpsUpsCounter {
-    FpsUpsCounter{
+    FpsUpsCounter {
         current_time: Instant::now(),
         fps_counter: 0,
-        ups_counter: 0
+        ups_counter: 0,
     }
 }
 

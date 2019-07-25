@@ -1,5 +1,7 @@
 extern crate gl;
 extern crate glutin;
+extern crate image;
+extern crate collada;
 
 mod window_utilities;
 mod game;
@@ -17,8 +19,6 @@ fn main() {
 
     let mut window_size = windowed_context.window().inner_size();
 
-
-
     use std::time::{Duration, Instant};
 
     let mut fps_ups_counter = window_utilities::new_fps_ups_counter();
@@ -26,7 +26,6 @@ fn main() {
     let game_time = Instant::now();
     let mut previous = game_time.elapsed();
     let mut lag = Duration::from_micros(0);
-
 
     use glutin::event_loop::ControlFlow;
     use glutin::event::{DeviceEvent, WindowEvent, Event};

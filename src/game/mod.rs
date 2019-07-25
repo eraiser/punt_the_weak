@@ -9,6 +9,7 @@ mod model;
 
 mod view;
 mod controls;
+mod loader;
 
 use crate::settings::*;
 use crate::game::GameMode::Menu;
@@ -52,8 +53,13 @@ pub fn new_game() -> Game {
 
 impl Game {
     pub fn load_scene(&mut self) {
+
+
+
         self.items.push(model::triangle());
         //self.items[0].set_rotation_speed_x(std::f32::consts::PI);
+        //self.items[0].set_rotation_speed_y(std::f32::consts::PI);
+        //self.items[0].set_rotation_speed_z(std::f32::consts::PI);
         //self.items[0].set_movement_vector(Vector3{x:1.0,y:0.0,z:0.0});
     }
 
@@ -144,13 +150,14 @@ impl Game {
     pub fn draw(&mut self, interpolation_value: f32) {
         unsafe {
             gl::ClearColor(0.0, 1.0, 0.3, 1.0);
-            gl::Clear(gl::COLOR_BUFFER_BIT);
+            gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
         }
 
         self.renderer.use_3d_program();
         let vm = self.camera.get_int_view_matrix(&interpolation_value);
         for m in self.items.iter() {
             self.renderer.set_mvp(m.get_int_model_matrix(&interpolation_value), vm);
+            self.renderer.set_texture(m.get_texture());
             m.draw_3d();
         }
     }
