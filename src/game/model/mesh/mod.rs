@@ -17,9 +17,8 @@ pub fn new_static_3d_mesh(
     normal_data: Vec<f32>,
     uv_data: Vec<f32>,
     indices: Vec<i16>) -> Mesh {
+
     let mut vertex_array_id = 0;
-
-
     unsafe {
         // Create Vertex Array Object
         gl::GenVertexArrays(1, &mut vertex_array_id);

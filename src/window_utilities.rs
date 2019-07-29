@@ -22,6 +22,7 @@ pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<Possibly
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
         gl::DepthFunc(gl::LESS);
+        //gl::PolygonMode( gl::FRONT_AND_BACK, gl::LINE );
     }
     (event_loop, windowed_context)
 }

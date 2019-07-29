@@ -3,6 +3,7 @@ use cgmath::Matrix4;
 use gl::types::*;
 pub struct Renderer {
     shader_program_3d: GLuint,
+    shader_program_2d: GLuint,
     perspective_matrix: cgmath::Matrix4<f32>,
     mvp_location: GLint,
     texture_location: GLint,
@@ -14,9 +15,15 @@ impl Renderer {
             gl::UseProgram(self.shader_program_3d);
         }
     }
+    pub fn use_2d_program(&self) {
+        unsafe {
+            gl::UseProgram(self.shader_program_2d);
+        }
+    }
     pub fn cleanup(&self) {
         unsafe {
             gl::DeleteProgram(self.shader_program_3d);
+            gl::DeleteProgram(self.shader_program_2d);
         }
     }
     pub fn set_mvp(&self, m_matrix: Matrix4<f32>, v_matrix: Matrix4<f32>) {
@@ -44,10 +51,13 @@ mod shader_utilities;
 pub fn init_renderer() -> Renderer {
     let vs_3d =
         shader_utilities::compile_shader(include_str!("../shader/vs_3d.glsl"), gl::VERTEX_SHADER);
+    let vs_2d =
+        shader_utilities::compile_shader(include_str!("../shader/vs_2d.glsl"), gl::VERTEX_SHADER);
     let fs =
         shader_utilities::compile_shader(include_str!("../shader/fs.glsl"), gl::FRAGMENT_SHADER);
 
     let program_3d = shader_utilities::link_program(vs_3d, fs);
+    let program_2d = shader_utilities::link_program(vs_2d, fs);
 
     unsafe {
         gl::DeleteShader(fs);
@@ -73,6 +83,7 @@ pub fn init_renderer() -> Renderer {
 
     Renderer {
         shader_program_3d: program_3d,
+        shader_program_2d: program_2d,
         perspective_matrix,
         mvp_location,
         texture_location

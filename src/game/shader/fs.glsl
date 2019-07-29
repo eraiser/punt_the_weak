@@ -11,6 +11,7 @@ void main()
 
     // Output color = red
     //color = fragmentColor;
-	color = texture( myTextureSampler, UV ).bgr;
+
+	color = texture( myTextureSampler, UV ).rgb;
 
 }

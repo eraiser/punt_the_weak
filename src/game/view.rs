@@ -88,6 +88,7 @@ impl Camera {
         }
     }
     pub fn get_speed(&self) -> f32 { self.speed }
+    pub fn set_speed(&mut self,s:f32) { self.speed = s}
     pub fn get_position(&self) -> Point3<f32> {self.position}
 
 }

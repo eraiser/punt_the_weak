@@ -13,6 +13,7 @@ mod loader;
 
 use crate::settings::*;
 use crate::game::GameMode::Menu;
+use std::f32::consts::PI;
 
 enum GameMode {
     Menu,
@@ -22,6 +23,7 @@ enum GameMode {
 pub struct Game {
     renderer: renderer::Renderer,
     items: Vec<model::Model>,
+    io_items: Vec<model::Model>,
     camera: view::Camera,
     controls: controls::Controls,
     game_mode: GameMode,
@@ -43,6 +45,7 @@ pub fn new_game() -> Game {
     Game {
         renderer: renderer::init_renderer(),
         items: Vec::new(),
+        io_items: Vec::new(),
         camera: view::new_camera(cam_pos, cam_dir),
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
@@ -56,7 +59,11 @@ impl Game {
 
 
 
-        self.items.push(model::triangle());
+        //self.items.push(model::triangle());
+        //self.items.push(model::plane());
+        //self.items[1].rotate_x(PI/2.0);
+        self.items.push(model::dist_cube());
+        self.io_items.push(model::io_2d());
         //self.items[0].set_rotation_speed_x(std::f32::consts::PI);
         //self.items[0].set_rotation_speed_y(std::f32::consts::PI);
         //self.items[0].set_rotation_speed_z(std::f32::consts::PI);
@@ -64,50 +71,57 @@ impl Game {
     }
 
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
-        match self.game_mode {
-            GameMode::Playing => {
-                use glutin::event::VirtualKeyCode::*;
-                use glutin::event::ElementState::*;
-                match input.virtual_keycode.unwrap() {
-                    W => if input.state == Pressed { self.controls.forward = true } else { self.controls.forward = false },
-                    S => if input.state == Pressed { self.controls.backward = true } else { self.controls.backward = false },
-                    A => if input.state == Pressed { self.controls.left = true } else { self.controls.left = false },
-                    D => if input.state == Pressed { self.controls.right = true } else { self.controls.right = false },
-                    X => if input.state == Pressed { self.controls.down = true } else { self.controls.down = false },
-                    Y => if input.state == Pressed { self.controls.up = true } else { self.controls.up = false },
-                    F => if input.state == Pressed {
-                        match self.game_mode {
-                            GameMode::Playing => self.game_mode = Menu,
-                            GameMode::Menu => self.game_mode = GameMode::Playing
+        match input.virtual_keycode {
+            Some(key) => {
+                match self.game_mode {
+                    GameMode::Playing => {
+                        use glutin::event::VirtualKeyCode::*;
+                        use glutin::event::ElementState::*;
+                        match key {
+                            W => if input.state == Pressed { self.controls.forward = true } else { self.controls.forward = false },
+                            S => if input.state == Pressed { self.controls.backward = true } else { self.controls.backward = false },
+                            A => if input.state == Pressed { self.controls.left = true } else { self.controls.left = false },
+                            D => if input.state == Pressed { self.controls.right = true } else { self.controls.right = false },
+                            X => if input.state == Pressed { self.controls.down = true } else { self.controls.down = false },
+                            Y => if input.state == Pressed { self.controls.up = true } else { self.controls.up = false },
+                            F => if input.state == Pressed {
+                                match self.game_mode {
+                                    GameMode::Playing => self.game_mode = Menu,
+                                    GameMode::Menu => self.game_mode = GameMode::Playing
+                                }
+                                self.game_mode_changed = true;
+                            }
+                            Escape => {
+                                self.cleanup();
+                                return ControlFlow::Exit;
+                            }
+                            LShift => if input.state == Pressed { self.camera.set_speed(5.0) } else { self.camera.set_speed(1.0) },
+                            _ => ()
                         }
-                        self.game_mode_changed = true;
                     }
-                    Escape => {
-                        self.cleanup();
-                        return ControlFlow::Exit;
+                    GameMode::Menu => {
+                        use glutin::event::VirtualKeyCode::*;
+                        use glutin::event::ElementState::*;
+                        match key {
+                            F => if input.state == Pressed {
+                                match self.game_mode {
+                                    GameMode::Playing => self.game_mode = Menu,
+                                    GameMode::Menu => self.game_mode = GameMode::Playing
+                                }
+                                self.game_mode_changed = true;
+                            }
+                            Escape => {
+                                self.cleanup();
+                                return ControlFlow::Exit;
+                            }
+                            _ => ()
+                        }
                     }
-                    _ => ()
                 }
             }
-            GameMode::Menu => {
-                use glutin::event::VirtualKeyCode::*;
-                use glutin::event::ElementState::*;
-                match input.virtual_keycode.unwrap() {
-                    F => if input.state == Pressed {
-                        match self.game_mode {
-                            GameMode::Playing => self.game_mode = Menu,
-                            GameMode::Menu => self.game_mode = GameMode::Playing
-                        }
-                        self.game_mode_changed = true;
-                    }
-                    Escape => {
-                        self.cleanup();
-                        return ControlFlow::Exit;
-                    }
-                    _ => ()
-                }
-            }
+            None => ()
         }
+
         ControlFlow::Poll
     }
 
@@ -160,6 +174,13 @@ impl Game {
             self.renderer.set_texture(m.get_texture());
             m.draw_3d();
         }
+        self.renderer.use_2d_program();
+        for m in self.io_items.iter() {
+            self.renderer.set_texture(m.get_texture());
+            m.draw_3d();
+        }
+
+
     }
 
 
@@ -167,6 +188,9 @@ impl Game {
         self.renderer.cleanup();
 
         for i in self.items.iter() {
+            i.cleanup();
+        }
+        for i in self.io_items.iter() {
             i.cleanup();
         }
     }

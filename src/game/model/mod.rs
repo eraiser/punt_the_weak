@@ -110,7 +110,7 @@ mod example;
 
 pub fn triangle() -> Model {
 
-    let mesh = crate::game::loader::load_collada_mesh(include_str!("untitled.dae"));
+    let mesh = crate::game::loader::load_collada_mesh(include_str!("res/untitled.dae"));
 
     Model {
         mesh,
@@ -123,6 +123,69 @@ pub fn triangle() -> Model {
         scale: 1.0,
         model_matrix: cgmath::SquareMatrix::identity(),
         motion: motion::new_motion(),
-        texture: crate::game::loader::load_texture("./src/game/model/Untitled.001.png")
+        texture: crate::game::loader::load_texture("./src/game/model/res/Untitled.001.png")
+    }
+}
+
+pub fn plane() -> Model {
+
+    let mesh = crate::game::loader::load_collada_mesh(include_str!("res/plane.dae"));
+
+    Model {
+        mesh,
+        translation: Vector3 {
+            x: 5.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        rotation: cgmath::SquareMatrix::identity(),
+        scale: 1.0,
+        model_matrix: cgmath::SquareMatrix::identity(),
+        motion: motion::new_motion(),
+        texture: crate::game::loader::load_texture("./src/game/model/res/Untitled.001.png")
+    }
+}
+
+pub fn dist_cube() -> Model {
+
+    let mesh = crate::game::loader::load_collada_mesh(include_str!("res/dist.dae"));
+
+    Model {
+        mesh,
+        translation: Vector3 {
+            x: -5.0,
+            y: 0.0,
+            z: 0.0,
+        },
+        //rotation: cgmath::SquareMatrix::identity(),
+        rotation: cgmath::Matrix4::from_angle_x(Rad(-std::f32::consts::PI/2.0)),
+        scale: 1.0,
+        model_matrix: cgmath::SquareMatrix::identity(),
+        motion: motion::new_motion(),
+        texture: crate::game::loader::load_texture("./src/game/model/res/Untitled.001.png")
+    }
+}
+
+use gl::types::*;
+
+static VERTEX_DATA_2D: [GLfloat; 12] = [0.25, 1.0, 0.0, 1.0, 1.0, 0.0, 0.25, 0.25, 0.0, 1.0, 0.25, 0.0];
+static UV_DATA_2D: [GLfloat; 8] = [0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 1.0, 0.0];
+static NORMAL_DATA_2D: [GLfloat; 12] = [0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 0.0, 1.0];
+static INDICES: [i16; 6] = [0,1,2,2,1,3];
+
+pub fn io_2d() -> Model {
+
+    Model {
+        mesh: mesh::new_static_3d_mesh(VERTEX_DATA_2D.to_vec(),NORMAL_DATA_2D.to_vec(),UV_DATA_2D.to_vec(),INDICES.to_vec()),
+        translation: Vector3 {
+            x: -5.0,
+            y: 1.0,
+            z: 0.0,
+        },
+        rotation: cgmath::SquareMatrix::identity(),
+        scale: 1.0,
+        model_matrix: cgmath::SquareMatrix::identity(),
+        motion: motion::new_motion(),
+        texture: crate::game::loader::load_texture("./src/game/model/res/Untitled.001.png")
     }
 }
