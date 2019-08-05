@@ -30,7 +30,6 @@ fn main() {
     use glutin::event_loop::ControlFlow;
     use glutin::event::{DeviceEvent, WindowEvent, Event};
 
-    //windowed_context.window().set_decorations(false);
 
     event_loop.run(move |event, _, control_flow| {
         match event {

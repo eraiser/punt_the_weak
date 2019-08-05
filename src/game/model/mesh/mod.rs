@@ -1,4 +1,3 @@
-
 pub struct Mesh {
     vertex_array_id: gl::types::GLuint,
     vertex_buffer_id: gl::types::GLuint,
@@ -20,7 +19,6 @@ pub fn new_static_3d_mesh(
 
     let mut vertex_array_id = 0;
     unsafe {
-        // Create Vertex Array Object
         gl::GenVertexArrays(1, &mut vertex_array_id);
         gl::BindVertexArray(vertex_array_id);
     }
@@ -33,7 +31,8 @@ pub fn new_static_3d_mesh(
     unsafe {
         gl::GenBuffers(1, &mut element_buffer_id);
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, element_buffer_id);
-        gl::BufferData(gl::ELEMENT_ARRAY_BUFFER, (indices.len() * std::mem::size_of::<GLshort>()) as GLsizeiptr,
+        gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
+                       (indices.len() * std::mem::size_of::<GLshort>()) as GLsizeiptr,
                        std::mem::transmute(&indices[0]),
                        gl::STATIC_DRAW,
         );
@@ -46,7 +45,7 @@ pub fn new_static_3d_mesh(
         uv_buffer_id,
         normal_buffer_id,
         element_buffer_id,
-        vertex_count
+        vertex_count,
     }
 }
 
@@ -58,11 +57,10 @@ fn fill_buffer(buffer_data: Vec<f32>) -> u32 {
         // Create a Vertex Buffer Object and copy the vertex data to it
         gl::GenBuffers(1, &mut buffer_id);
         gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
-        gl::BufferData(
-            gl::ARRAY_BUFFER,
-            (buffer_data.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
-            std::mem::transmute(&buffer_data[0]),
-            gl::STATIC_DRAW,
+        gl::BufferData(gl::ARRAY_BUFFER,
+                       (buffer_data.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
+                       std::mem::transmute(&buffer_data[0]),
+                       gl::STATIC_DRAW,
         );
     }
 
@@ -70,10 +68,8 @@ fn fill_buffer(buffer_data: Vec<f32>) -> u32 {
 }
 
 impl Mesh {
-
     pub fn draw_3d(&self) {
         unsafe {
-
             gl::EnableVertexAttribArray(0);
             //gl::BindVertexArray(self.vertex_array_id);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_buffer_id);
@@ -92,9 +88,9 @@ impl Mesh {
             gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.element_buffer_id);
 
             gl::DrawElements(gl::TRIANGLES,
-                           self.vertex_count,
-                           gl::UNSIGNED_SHORT,
-                           ptr::null());
+                             self.vertex_count,
+                             gl::UNSIGNED_SHORT,
+                             ptr::null());
 
             gl::DisableVertexAttribArray(0);
             gl::DisableVertexAttribArray(1);
@@ -108,6 +104,5 @@ impl Mesh {
             gl::DeleteBuffers(1, &self.uv_buffer_id);
             gl::DeleteVertexArrays(1, &self.vertex_array_id);
         }
-
     }
 }

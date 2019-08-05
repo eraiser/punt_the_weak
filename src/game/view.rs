@@ -30,10 +30,10 @@ pub fn new_camera(position: Point3<f32>, look_direction: Vector3<f32>) -> Camera
 }
 
 impl Camera {
-    pub fn get_int_view_matrix(&mut self, i_v: &f32) -> Matrix4<f32> {
+    pub fn get_int_view_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         match self.move_direction {
             Some(m_d) => {
-                let is = m_d * *i_v ;
+                let is = m_d * i_v ;
                 self.interpolated_step = Some(is.clone());
 
                 Matrix4::look_at_dir(self.position+is, self.get_rotation()*self.look_direction, self.up)
@@ -83,7 +83,7 @@ impl Camera {
             None => {
                 let v = self.get_rotation()*self.look_direction;
                 self.current_direction = Some(v);
-                return v;
+                v
             }
         }
     }

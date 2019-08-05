@@ -57,17 +57,21 @@ pub fn new_game() -> Game {
 impl Game {
     pub fn load_scene(&mut self) {
 
-
-
-        //self.items.push(model::triangle());
+        self.items.push(model::triangle());
+        //self.items[0].set_rotation_speed_y(PI);
+        self.items[0].set_movement_vector(Vector3{
+            x: 2.0,
+            y: 0.0,
+            z: 0.0
+        })
         //self.items.push(model::plane());
         //self.items[1].rotate_x(PI/2.0);
-        self.items.push(model::dist_cube());
-        self.io_items.push(model::io_2d());
+        //self.io_items.push(model::io_2d());
         //self.items[0].set_rotation_speed_x(std::f32::consts::PI);
         //self.items[0].set_rotation_speed_y(std::f32::consts::PI);
         //self.items[0].set_rotation_speed_z(std::f32::consts::PI);
         //self.items[0].set_movement_vector(Vector3{x:1.0,y:0.0,z:0.0});
+
     }
 
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
@@ -141,8 +145,7 @@ impl Game {
                                                 , self.camera.get_speed() / TICKS_PER_SECOND as f32);
         self.camera.move_dir(mv);
 
-        self.items[0].update();
-
+        self.items.iter_mut().for_each(|m| m.update());
 
         if self.game_mode_changed {
             match self.game_mode {
@@ -168,9 +171,9 @@ impl Game {
         }
 
         self.renderer.use_3d_program();
-        let vm = self.camera.get_int_view_matrix(&interpolation_value);
-        for m in self.items.iter() {
-            self.renderer.set_mvp(m.get_int_model_matrix(&interpolation_value), vm);
+        let vm = self.camera.get_int_view_matrix(interpolation_value);
+        for m in self.items.iter_mut() {
+            self.renderer.set_mvp(m.get_intr_model_matrix(interpolation_value), vm);
             self.renderer.set_texture(m.get_texture());
             m.draw_3d();
         }
