@@ -20,14 +20,14 @@ pub fn new_motion() -> Motion {
 
 impl Motion {
 
-    pub fn get_intr_rotation_speed_x(&mut self, i_v: f32) -> Rad<f32> {
-        self.x_rotation_speed.map_or_else( || Rad(0.0), |r| r*i_v)
+    pub fn get_intr_rotation_speed_x(&mut self, i_v: f32) -> Option<Rad<f32>> {
+        self.x_rotation_speed.map(  |r| r*i_v)
     }
-    pub fn get_intr_rotation_speed_y(&mut self, i_v: f32) -> Rad<f32> {
-        self.y_rotation_speed.map_or_else( || Rad(0.0), |r| r*i_v)
+    pub fn get_intr_rotation_speed_y(&mut self, i_v: f32) -> Option<Rad<f32>> {
+        self.y_rotation_speed.map(  |r| r*i_v)
     }
-    pub fn get_intr_rotation_speed_z(&mut self, i_v: f32) -> Rad<f32> {
-        self.z_rotation_speed.map_or_else( || Rad(0.0), |r| r*i_v)
+    pub fn get_intr_rotation_speed_z(&mut self, i_v: f32) -> Option<Rad<f32>> {
+        self.z_rotation_speed.map(  |r| r*i_v)
     }
     pub fn get_intr_movement(&mut self, i_v: f32) -> Vector3<f32> {
         use cgmath::prelude::Zero;

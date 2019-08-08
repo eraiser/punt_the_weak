@@ -71,17 +71,14 @@ impl Mesh {
     pub fn draw_3d(&self) {
         unsafe {
             gl::EnableVertexAttribArray(0);
-            //gl::BindVertexArray(self.vertex_array_id);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.vertex_buffer_id);
             gl::VertexAttribPointer(0, 3, gl::FLOAT, gl::FALSE as GLboolean, 0, ptr::null());
 
             gl::EnableVertexAttribArray(1);
-            //gl::BindVertexArray(self.normal_buffer_id);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.normal_buffer_id);
             gl::VertexAttribPointer(1, 3, gl::FLOAT, gl::FALSE as GLboolean, 0, ptr::null());
 
             gl::EnableVertexAttribArray(2);
-            //gl::BindVertexArray(self.uv_buffer_id);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.uv_buffer_id);
             gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE as GLboolean, 0, ptr::null());
 

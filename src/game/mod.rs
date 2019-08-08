@@ -6,6 +6,7 @@ use cgmath::{Vector3, Point3};
 
 mod renderer;
 mod model;
+mod lighting;
 
 mod view;
 mod controls;
@@ -24,6 +25,7 @@ pub struct Game {
     renderer: renderer::Renderer,
     items: Vec<model::Model>,
     io_items: Vec<model::Model>,
+    light_sorces: Vec<lighting::LightSource>,
     camera: view::Camera,
     controls: controls::Controls,
     game_mode: GameMode,
@@ -46,6 +48,7 @@ pub fn new_game() -> Game {
         renderer: renderer::init_renderer(),
         items: Vec::new(),
         io_items: Vec::new(),
+        light_sorces: Vec::new(),
         camera: view::new_camera(cam_pos, cam_dir),
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
@@ -56,24 +59,28 @@ pub fn new_game() -> Game {
 
 impl Game {
     pub fn load_scene(&mut self) {
-
         self.items.push(model::triangle());
-        //self.items[0].set_rotation_speed_y(PI);
-        self.items[0].set_movement_vector(Vector3{
-            x: 2.0,
-            y: 0.0,
-            z: 0.0
-        })
-        //self.items.push(model::plane());
-        //self.items[1].rotate_x(PI/2.0);
-        //self.io_items.push(model::io_2d());
-        //self.items[0].set_rotation_speed_x(std::f32::consts::PI);
-        //self.items[0].set_rotation_speed_y(std::f32::consts::PI);
-        //self.items[0].set_rotation_speed_z(std::f32::consts::PI);
-        //self.items[0].set_movement_vector(Vector3{x:1.0,y:0.0,z:0.0});
+        //self.items[0].set_rotation_speed_x(PI / 4.0);
+        self.items[0].set_rotation_speed_y(PI / 4.0);
+        //self.items[0].set_rotation_speed_z(PI / 4.0);
 
+
+        let pos = [Vector3 { x: 5.0, y: 3.0, z: 5.0 },
+            Vector3 { x: 5.0, y: 3.0, z: -5.0 },
+            Vector3 { x: -5.0, y: 3.0, z: 5.0 },
+            Vector3 { x: -5.0, y: 3.0, z: -5.0 },
+        ];
+
+        let red = Vector3 { x: 1.0, y: 0.0, z: 0.0 };
+        let green = Vector3 { x: 0.0, y: 1.0, z: 0.0 };
+        let blue = Vector3 { x: 0.0, y: 0.0, z: 1.0 };
+        let white = Vector3 { x: 1.0, y: 1.0, z: 1.0 };
+
+        self.light_sorces.push(lighting::new_light_source(pos[0], red, 50.0));
+        self.light_sorces.push(lighting::new_light_source(pos[1], green, 50.0));
+        self.light_sorces.push(lighting::new_light_source(pos[2], blue, 50.0));
+        self.light_sorces.push(lighting::new_light_source(pos[3], white, 50.0));
     }
-
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
         match input.virtual_keycode {
             Some(key) => {
@@ -171,19 +178,39 @@ impl Game {
         }
 
         self.renderer.use_3d_program();
-        let vm = self.camera.get_int_view_matrix(interpolation_value);
+
+        let view_matrix = self.camera.get_int_view_matrix(interpolation_value);
+
+        /*
+        TODO: Calculate closest 4 light sources
+        */
+        let z = Vector3{x:0.0,y:0.0,z:0.0};
+        let mut light_pos:[Vector3<f32>;4] = [z,z,z,z];
+        let mut light_col:[Vector3<f32>;4] = [z,z,z,z];
+        let mut light_pow:[f32;4] = [0.0,0.0,0.0,0.0];
+        let mut i = 0;
+
+        for ls in &self.light_sorces {
+            light_pos[i] = ls.translation;
+            light_col[i] = ls.color;
+            light_pow[i] = ls.power;
+            i+=1;
+        }
+
+        self.renderer.set_uniform_light_positions_worldspace(light_pos);
+        self.renderer.set_uniform_light_colors(light_col);
+        self.renderer.set_uniform_light_powers(light_pow);
+
+        self.renderer.set_uniform_v(view_matrix);
+
         for m in self.items.iter_mut() {
-            self.renderer.set_mvp(m.get_intr_model_matrix(interpolation_value), vm);
+            let model_matrix = m.get_intr_model_matrix(interpolation_value);
+
+            self.renderer.set_uniform_m(model_matrix);
+            self.renderer.set_uniform_mvp(model_matrix, view_matrix);
             self.renderer.set_texture(m.get_texture());
             m.draw_3d();
         }
-        self.renderer.use_2d_program();
-        for m in self.io_items.iter() {
-            self.renderer.set_texture(m.get_texture());
-            m.draw_3d();
-        }
-
-
     }
 
 

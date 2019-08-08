@@ -140,7 +140,6 @@ impl Model {
     }
 
     pub fn get_intr_model_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
-
         let rotation = self.get_intr_rotation_matrix(i_v);
         let translation = self.get_intr_translation_matrix(i_v);
         let scale = self.get_scale_matrix();
@@ -152,12 +151,21 @@ impl Model {
     fn get_intr_rotation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         use crate::settings::TICKS_PER_SECOND as tps;
         if self.motion.is_rotating() {
-            let r_x = cgmath::Matrix4::from_angle_x(self.rotation_x + self.motion.get_intr_rotation_speed_x(i_v)/tps);
-            let r_y = cgmath::Matrix4::from_angle_y(self.rotation_y + self.motion.get_intr_rotation_speed_y(i_v)/tps);
-            let r_z = cgmath::Matrix4::from_angle_z(self.rotation_z + self.motion.get_intr_rotation_speed_z(i_v)/tps);
+            let r_x = cgmath::Matrix4::from_angle_x(self.motion.get_intr_rotation_speed_x(i_v).map_or_else(|| self.rotation_x, |r| self.rotation_x + r / tps));
+            let r_y = cgmath::Matrix4::from_angle_y(self.motion.get_intr_rotation_speed_y(i_v).map_or_else(|| self.rotation_y, |r| self.rotation_y + r / tps));
+            let r_z = cgmath::Matrix4::from_angle_z(self.motion.get_intr_rotation_speed_z(i_v).map_or_else(|| self.rotation_z, |r| self.rotation_z + r / tps));
             r_z * r_y * r_x
         } else {
             self.get_rotation_matrix()
+        }
+    }
+
+    fn get_intr_translation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
+        use crate::settings::TICKS_PER_SECOND as tps;
+        if self.motion.is_moving() {
+            return cgmath::Matrix4::from_translation(self.translation + self.motion.get_intr_movement(i_v) / tps);
+        } else {
+            self.get_translation_matrix()
         }
     }
 
@@ -184,14 +192,6 @@ impl Model {
                 s
             }
         }
-    }
-
-    fn get_intr_translation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
-        use crate::settings::TICKS_PER_SECOND as tps;
-        if self.motion.is_moving() {
-            return cgmath::Matrix4::from_translation(self.translation + self.motion.get_intr_movement(i_v)/tps);
-        }
-        self.get_translation_matrix()
     }
 
     fn get_translation_matrix(&mut self) -> Matrix4<f32> {

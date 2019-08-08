@@ -20,7 +20,6 @@ pub fn load_texture(path: &str) -> u32 {
         gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, dim.0 as i32, dim.1 as i32, 0, gl::RGBA, gl::UNSIGNED_BYTE,
                        im.into_raw().as_ptr() as *mut std::ffi::c_void );
 
-        //std::mem::transmute(&im.raw_pixels()[0])
         // ... nice trilinear filtering ...
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
