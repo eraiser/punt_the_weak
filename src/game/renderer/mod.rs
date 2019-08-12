@@ -3,9 +3,11 @@ use cgmath::{Matrix4, Vector3};
 use gl::types::*;
 use std::os::raw::c_float;
 
+use crate::settings::MAX_LIGHTS;
+
 pub struct Renderer {
-    shader_program_3d: GLuint,
     perspective_matrix: cgmath::Matrix4<f32>,
+    shader_program_3d: GLuint,
     light_positions_location: GLint,
     light_colors_location: GLint,
     light_powers_location: GLint,
@@ -15,7 +17,6 @@ pub struct Renderer {
     texture_location: GLint,
 }
 
-const MAX_LIGHTS:usize = 4;
 
 impl Renderer {
     pub fn use_3d_program(&self) {

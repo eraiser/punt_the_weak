@@ -38,8 +38,6 @@ void main(){
 	// Eye vector (towards the camera)
 	vec3 E = normalize(EyeDirection_cameraspace);
 
-	bool condition = false;
-
 	for(int i=0 ; i<MAX_LIGHTS ; i++) {
 		// Distance to the light
 		float distance = length( LightPositions_worldspace[i] - Position_worldspace );
@@ -63,9 +61,6 @@ void main(){
 
 		// Diffuse : "color" of the object
 		vec3 calc1 = (MaterialDiffuseColor * LightColors[i] * LightPowers[i] * cosTheta / (distance*distance));
-
-		if ( calc1.x > 0.2 )
-			condition = true;
 
 		TotalDiffuseColor = TotalDiffuseColor + calc1;
 

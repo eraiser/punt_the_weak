@@ -1,9 +1,6 @@
 pub fn load_texture(path: &str) -> u32 {
     let mut texture = 0;
 
-    use std::path::Path;
-    use crate::image::GenericImageView;
-
     let im = image::open(&Path::new(path)).unwrap().flipv();
 
     let im = match im {
@@ -32,12 +29,15 @@ pub fn load_texture(path: &str) -> u32 {
     texture
 }
 
-use crate::game::model::mesh::Mesh;
-use crate::game::model::mesh;
+use crate::game::item::mesh;
+use crate::game::item::mesh::Mesh;
 
 
-pub fn load_collada_mesh(file: &str) -> Mesh {
-    let doc = collada::document::ColladaDocument::from_str(file).unwrap();
+pub fn load_collada_mesh(path: &str) -> Mesh {
+
+    let path = Path::new(path);
+
+    let doc = collada::document::ColladaDocument::from_path(path).unwrap();
 
     let obj_data = &doc.get_obj_set().unwrap().objects[0];
 
@@ -64,10 +64,11 @@ pub fn load_collada_mesh(file: &str) -> Mesh {
                                 , indices);
 
 
-    mesh::new_static_3d_mesh(vert, norm, tex, int)
+    mesh::new_untextured_mesh(vert, norm, tex, int)
 }
 
 use collada::{Vertex, TVertex, Triangles};
+use std::path::Path;
 
 fn fill_vtn_vectors(vertices_indexed: &Vec<Vertex>, texture_data_indexed: &Vec<TVertex>, normals_indexed: &Vec<Vertex>, indices: &Triangles)
                     -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
@@ -77,9 +78,6 @@ fn fill_vtn_vectors(vertices_indexed: &Vec<Vertex>, texture_data_indexed: &Vec<T
 
     let mut int = Vec::new();
     let mut i = 0;
-
-    let ind_i = indices.vertices.iter();
-
 
     for triangle in indices.vertices.iter() {
         let vtn_i = triangle.0;

@@ -5,12 +5,11 @@ use cgmath::{Vector3, Point3};
 
 
 mod renderer;
-mod model;
-mod lighting;
 
 mod view;
 mod controls;
-mod loader;
+
+mod item;
 
 use crate::settings::*;
 use crate::game::GameMode::Menu;
@@ -23,9 +22,7 @@ enum GameMode {
 
 pub struct Game {
     renderer: renderer::Renderer,
-    items: Vec<model::Model>,
-    io_items: Vec<model::Model>,
-    light_sorces: Vec<lighting::LightSource>,
+    item_handler: item::ItemHandler,
     camera: view::Camera,
     controls: controls::Controls,
     game_mode: GameMode,
@@ -46,9 +43,7 @@ pub fn new_game() -> Game {
     };
     Game {
         renderer: renderer::init_renderer(),
-        items: Vec::new(),
-        io_items: Vec::new(),
-        light_sorces: Vec::new(),
+        item_handler: item::new_item_handler(),
         camera: view::new_camera(cam_pos, cam_dir),
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
@@ -59,27 +54,79 @@ pub fn new_game() -> Game {
 
 impl Game {
     pub fn load_scene(&mut self) {
-        self.items.push(model::triangle());
-        //self.items[0].set_rotation_speed_x(PI / 4.0);
-        self.items[0].set_rotation_speed_y(PI / 4.0);
-        //self.items[0].set_rotation_speed_z(PI / 4.0);
+        let r = self.item_handler.add_new_model("./src/game/item/loader/res/ball.dae",
+                                                "./src/game/item/loader/res/Untitled.001.png");
+        r.translate(Vector3 {
+            x: 2.0,
+            y: 0.0,
+            z: 0.0,
+        });
 
+        r.set_rotation_speed_y(PI / 4.0);
 
-        let pos = [Vector3 { x: 5.0, y: 3.0, z: 5.0 },
-            Vector3 { x: 5.0, y: 3.0, z: -5.0 },
-            Vector3 { x: -5.0, y: 3.0, z: 5.0 },
-            Vector3 { x: -5.0, y: 3.0, z: -5.0 },
-        ];
+        let r = self.item_handler.add_new_model("./src/game/item/loader/res/ball.dae",
+                                                "./src/game/item/loader/res/Untitled.001.png");
+        r.translate(Vector3 {
+            x: -2.0,
+            y: 0.0,
+            z: 0.0,
+        });
 
-        let red = Vector3 { x: 1.0, y: 0.0, z: 0.0 };
-        let green = Vector3 { x: 0.0, y: 1.0, z: 0.0 };
-        let blue = Vector3 { x: 0.0, y: 0.0, z: 1.0 };
-        let white = Vector3 { x: 1.0, y: 1.0, z: 1.0 };
+        r.set_rotation_speed_y(-PI / 4.0);
 
-        self.light_sorces.push(lighting::new_light_source(pos[0], red, 50.0));
-        self.light_sorces.push(lighting::new_light_source(pos[1], green, 50.0));
-        self.light_sorces.push(lighting::new_light_source(pos[2], blue, 50.0));
-        self.light_sorces.push(lighting::new_light_source(pos[3], white, 50.0));
+        self.item_handler.add_light_source(item::lighting::new_light_source(
+            Vector3{
+                x: 5.0,
+                y: 0.0,
+                z: 5.0
+            },
+            Vector3{
+                x: 1.0,
+                y: 0.0,
+                z: 0.0
+            },
+            20.0
+        ));
+        self.item_handler.add_light_source(item::lighting::new_light_source(
+            Vector3{
+                x: -5.0,
+                y: 0.0,
+                z: 5.0
+            },
+            Vector3{
+                x: 0.0,
+                y: 1.0,
+                z: 0.0
+            },
+            20.0
+        ));
+        self.item_handler.add_light_source(item::lighting::new_light_source(
+            Vector3{
+                x: 5.0,
+                y: 0.0,
+                z: -5.0
+            },
+            Vector3{
+                x: 0.0,
+                y: 0.0,
+                z: 1.0
+            },
+            20.0
+        ));
+        self.item_handler.add_light_source(item::lighting::new_light_source(
+            Vector3{
+                x: -5.0,
+                y: 0.0,
+                z: -5.0
+            },
+            Vector3{
+                x: 1.0,
+                y: 1.0,
+                z: 1.0
+            },
+            20.0
+        ));
+
     }
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
         match input.virtual_keycode {
@@ -137,7 +184,6 @@ impl Game {
     }
 
     pub fn handle_cursor_movement(&mut self, delta_x: f32, delta_y: f32) {
-        use std::f32::consts::PI;
         match self.game_mode {
             GameMode::Playing => {
                 self.camera.rotate_x(PI * -delta_y);
@@ -152,7 +198,8 @@ impl Game {
                                                 , self.camera.get_speed() / TICKS_PER_SECOND as f32);
         self.camera.move_dir(mv);
 
-        self.items.iter_mut().for_each(|m| m.update());
+        self.item_handler.update();
+
 
         if self.game_mode_changed {
             match self.game_mode {
@@ -181,47 +228,34 @@ impl Game {
 
         let view_matrix = self.camera.get_int_view_matrix(interpolation_value);
 
-        /*
-        TODO: Calculate closest 4 light sources
-        */
-        let z = Vector3{x:0.0,y:0.0,z:0.0};
-        let mut light_pos:[Vector3<f32>;4] = [z,z,z,z];
-        let mut light_col:[Vector3<f32>;4] = [z,z,z,z];
-        let mut light_pow:[f32;4] = [0.0,0.0,0.0,0.0];
-        let mut i = 0;
 
-        for ls in &self.light_sorces {
-            light_pos[i] = ls.translation;
-            light_col[i] = ls.color;
-            light_pow[i] = ls.power;
-            i+=1;
-        }
-
-        self.renderer.set_uniform_light_positions_worldspace(light_pos);
-        self.renderer.set_uniform_light_colors(light_col);
-        self.renderer.set_uniform_light_powers(light_pow);
+        let (pos,col,pow) = self.item_handler.get_nearest_light_data();
+        self.renderer.set_uniform_light_positions_worldspace(pos);
+        self.renderer.set_uniform_light_colors(col);
+        self.renderer.set_uniform_light_powers(pow);
 
         self.renderer.set_uniform_v(view_matrix);
 
-        for m in self.items.iter_mut() {
-            let model_matrix = m.get_intr_model_matrix(interpolation_value);
+        for m in &mut self.item_handler.model_sets {
+            self.renderer.set_texture(m.1.get_texture());
 
-            self.renderer.set_uniform_m(model_matrix);
-            self.renderer.set_uniform_mvp(model_matrix, view_matrix);
-            self.renderer.set_texture(m.get_texture());
-            m.draw_3d();
+            m.1.enable_buffers();
+
+            for t in &mut m.0 {
+                let model_matrix = t.get_intr_model_matrix(interpolation_value);
+
+                self.renderer.set_uniform_m(model_matrix);
+                self.renderer.set_uniform_mvp(model_matrix, view_matrix);
+
+                m.1.draw();
+            }
+            m.1.disable_buffers();
         }
     }
 
 
     pub fn cleanup(&self) {
         self.renderer.cleanup();
-
-        for i in self.items.iter() {
-            i.cleanup();
-        }
-        for i in self.io_items.iter() {
-            i.cleanup();
-        }
+        self.item_handler.cleanup();
     }
 }
