@@ -8,6 +8,8 @@ use std::collections::HashMap;
 use cgmath::Vector3;
 
 use crate::settings::MAX_LIGHTS;
+use rayon::prelude::IntoParallelRefMutIterator;
+use rayon::iter::ParallelIterator;
 
 /*
 model_sets is a Vector that represents models with the same mesh and texture
@@ -46,6 +48,8 @@ impl ItemHandler {
                 let mut mesh = loader::load_collada_mesh(collada_path);
                 let texture = loader::load_texture(image_path);
                 mesh.set_texture(texture);
+
+                println!("loading");
 
                 self.model_sets.push((transform_vec, mesh));
 
@@ -87,10 +91,15 @@ impl ItemHandler {
     }
 
     pub fn update(&mut self) {
-        self.model_sets.iter_mut().for_each({
-            |s|
-                s.0.iter_mut().for_each(|m| m.update())
+        self.model_sets.par_iter_mut().for_each({ |s|
+                s.0.par_iter_mut().for_each(|m| m.update())
         });
+    }
+
+    pub fn calc_intp_modelmatrices(&mut self, i_v: f32) {
+        self.model_sets.par_iter_mut().for_each( {|s|
+            s.0.par_iter_mut().for_each(|m| m.calc_intp_model_matrix(i_v))
+        })
     }
 
     pub fn cleanup(&self) {

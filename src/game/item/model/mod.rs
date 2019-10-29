@@ -1,6 +1,6 @@
 pub mod motion;
 
-use cgmath::{Matrix4, Rad, Vector3};
+use cgmath::{Matrix4, Rad, Vector3, SquareMatrix};
 
 pub struct ModelTransforms {
     rotation_x: Rad<f32>,
@@ -12,6 +12,7 @@ pub struct ModelTransforms {
     scale: f32,
     scale_matrix: Option<Matrix4<f32>>,
     model_matrix: Option<Matrix4<f32>>,
+    current_model_matrix: Matrix4<f32>,
     motion: motion::Motion,
 }
 
@@ -31,6 +32,7 @@ pub fn new_model_transform() -> ModelTransforms {
         scale: 1.0,
         scale_matrix: None,
         model_matrix: None,
+        current_model_matrix: Matrix4::identity(),
         motion: motion::new_motion()
     }
 }
@@ -144,13 +146,18 @@ impl ModelTransforms {
         }
     }
 
-    pub fn get_intr_model_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
+    pub fn get_current_model_matrix(&self) -> Matrix4<f32> {
+        self.current_model_matrix
+    }
+    pub fn get_intp_model_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         let rotation = self.get_intr_rotation_matrix(i_v);
         let translation = self.get_intr_translation_matrix(i_v);
         let scale = self.get_scale_matrix();
+        translation * rotation * scale
+    }
 
-        let m_m = translation * rotation * scale;
-        m_m
+    pub fn calc_intp_model_matrix(&mut self, i_v: f32) {
+        self.current_model_matrix = self.get_intp_model_matrix(i_v);
     }
 
     fn get_intr_rotation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {

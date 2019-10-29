@@ -2,6 +2,8 @@ extern crate gl;
 extern crate glutin;
 extern crate image;
 extern crate collada;
+extern crate rayon;
+extern crate rand;
 
 mod window_utilities;
 mod game;
@@ -9,6 +11,7 @@ mod game;
 mod settings;
 
 use settings::*;
+use glutin::dpi::LogicalPosition;
 
 fn main() {
     let (event_loop, windowed_context)
@@ -18,6 +21,8 @@ fn main() {
     game.load_scene();
 
     let mut window_size = windowed_context.window().inner_size();
+    windowed_context.window().set_outer_position(LogicalPosition{ x: 0.0, y: 0.0 });
+
 
     use std::time::{Duration, Instant};
 
