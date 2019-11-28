@@ -1,4 +1,4 @@
-use cgmath::{Rad,Matrix4, Matrix3, Point3, Vector3};
+use cgmath::{Matrix3, Matrix4, Point3, Rad, Vector3};
 
 pub struct Camera {
     position: Point3<f32>,
@@ -33,34 +33,38 @@ impl Camera {
     pub fn get_int_view_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         match self.move_direction {
             Some(m_d) => {
-                let is = m_d * i_v ;
+                let is = m_d * i_v;
                 self.interpolated_step = Some(is.clone());
 
-                Matrix4::look_at_dir(self.position+is, self.get_rotation()*self.look_direction, self.up)
+                Matrix4::look_at_dir(
+                    self.position + is,
+                    self.get_rotation() * self.look_direction,
+                    self.up,
+                )
             }
-            None => {
-                Matrix4::look_at_dir(self.position, self.get_rotation()*self.look_direction, self.up)
-            }
+            None => Matrix4::look_at_dir(
+                self.position,
+                self.get_rotation() * self.look_direction,
+                self.up,
+            ),
         }
     }
 
     pub fn move_dir(&mut self, dir: Option<Vector3<f32>>) {
-
         if let Some(d) = self.move_direction {
             self.position += d;
         }
 
         self.move_direction = dir;
-
     }
 
     pub fn rotate_x(&mut self, angle: f32) {
-        self.x_rotation+=Rad(angle);
+        self.x_rotation += Rad(angle);
         self.rotation_matrix = None;
         self.current_direction = None;
     }
     pub fn rotate_y(&mut self, angle: f32) {
-        self.y_rotation+=Rad(angle);
+        self.y_rotation += Rad(angle);
         self.rotation_matrix = None;
         self.current_direction = None;
     }
@@ -69,9 +73,9 @@ impl Camera {
         match self.rotation_matrix {
             Some(m) => return m,
             None => {
-                let m = Matrix3::from_angle_y(self.y_rotation)*
-                        Matrix3::from_angle_x(self.x_rotation);
-                self.rotation_matrix= Some(m);
+                let m =
+                    Matrix3::from_angle_y(self.y_rotation) * Matrix3::from_angle_x(self.x_rotation);
+                self.rotation_matrix = Some(m);
                 return m;
             }
         }
@@ -81,20 +85,29 @@ impl Camera {
         match self.current_direction {
             Some(v) => return v,
             None => {
-                let v = self.get_rotation()*self.look_direction;
+                let v = self.get_rotation() * self.look_direction;
                 self.current_direction = Some(v);
                 v
             }
         }
     }
-    pub fn get_speed(&self) -> f32 { self.speed }
-    pub fn set_speed(&mut self,s:f32) { self.speed = s}
-    pub fn get_position(&self) -> Point3<f32> {self.position}
-
+    pub fn get_speed(&self) -> f32 {
+        self.speed
+    }
+    pub fn set_speed(&mut self, s: f32) {
+        self.speed = s
+    }
+    pub fn get_position(&self) -> Point3<f32> {
+        self.position
+    }
 }
 
 impl std::fmt::Display for Camera {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "(position \n {:?} \n direction {:?}", self.position, self.look_direction)
+        write!(
+            f,
+            "(position \n {:?} \n direction {:?}",
+            self.position, self.look_direction
+        )
     }
 }

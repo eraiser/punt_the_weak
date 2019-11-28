@@ -7,9 +7,9 @@ pub struct LightSource {
 }
 
 pub fn new_light_source(translation: Vector3<f32>, color: Vector3<f32>, power: f32) -> LightSource {
-    LightSource{
+    LightSource {
         translation,
         color,
-        power
+        power,
     }
 }

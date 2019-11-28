@@ -1,37 +1,36 @@
-
 use cgmath::{Rad, Vector3};
 pub struct Motion {
-    pub movement_vector: Option<Vector3<f32>>,
     // Units/sec
+    pub movement_vector: Option<Vector3<f32>>,
+    // Degree/sec
     pub x_rotation_speed: Option<Rad<f32>>,
     pub y_rotation_speed: Option<Rad<f32>>,
     pub z_rotation_speed: Option<Rad<f32>>,
-    // Degree/sec
 }
 
 pub fn new_motion() -> Motion {
     Motion {
-        movement_vector:    None,
-        x_rotation_speed:   None,
-        y_rotation_speed:   None,
-        z_rotation_speed:   None,
+        movement_vector: None,
+        x_rotation_speed: None,
+        y_rotation_speed: None,
+        z_rotation_speed: None,
     }
 }
 
 impl Motion {
-
     pub fn get_intr_rotation_speed_x(&mut self, i_v: f32) -> Option<Rad<f32>> {
-        self.x_rotation_speed.map(  |r| r*i_v)
+        self.x_rotation_speed.map(|r| r * i_v)
     }
     pub fn get_intr_rotation_speed_y(&mut self, i_v: f32) -> Option<Rad<f32>> {
-        self.y_rotation_speed.map(  |r| r*i_v)
+        self.y_rotation_speed.map(|r| r * i_v)
     }
     pub fn get_intr_rotation_speed_z(&mut self, i_v: f32) -> Option<Rad<f32>> {
-        self.z_rotation_speed.map(  |r| r*i_v)
+        self.z_rotation_speed.map(|r| r * i_v)
     }
     pub fn get_intr_movement(&mut self, i_v: f32) -> Vector3<f32> {
         use cgmath::prelude::Zero;
-        self.movement_vector.map_or_else( || cgmath::Vector3::zero(), |r| r*i_v)
+        self.movement_vector
+            .map_or_else(|| cgmath::Vector3::zero(), |r| r * i_v)
     }
 
     pub fn set_rotation_speed_x(&mut self, x_rs: f32) {
@@ -56,9 +55,12 @@ impl Motion {
         }
     }
     pub fn is_rotating(&self) -> bool {
-        if self.x_rotation_speed.is_some() || self.y_rotation_speed.is_some() || self.z_rotation_speed.is_some() {
+        if self.x_rotation_speed.is_some()
+            || self.y_rotation_speed.is_some()
+            || self.z_rotation_speed.is_some()
+        {
             true
-        }else {
+        } else {
             false
         }
     }

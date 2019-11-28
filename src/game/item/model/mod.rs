@@ -1,6 +1,6 @@
 pub mod motion;
 
-use cgmath::{Matrix4, Rad, Vector3, SquareMatrix};
+use cgmath::{Matrix4, Rad, SquareMatrix, Vector3};
 
 pub struct ModelTransforms {
     rotation_x: Rad<f32>,
@@ -17,7 +17,6 @@ pub struct ModelTransforms {
 }
 
 pub fn new_model_transform() -> ModelTransforms {
-
     ModelTransforms {
         rotation_x: Rad(0.0),
         rotation_y: Rad(0.0),
@@ -33,12 +32,11 @@ pub fn new_model_transform() -> ModelTransforms {
         scale_matrix: None,
         model_matrix: None,
         current_model_matrix: Matrix4::identity(),
-        motion: motion::new_motion()
+        motion: motion::new_motion(),
     }
 }
 
 impl ModelTransforms {
-
     pub fn rotate_x(&mut self, angle: f32) {
         self.rotation_x += Rad(angle);
     }
@@ -95,16 +93,11 @@ impl ModelTransforms {
     fn advance_translation(&mut self) {
         use crate::settings::TICKS_PER_SECOND as tps;
 
-        let mut change_occurred = false;
         self.motion.movement_vector.map(|v| {
             self.translation += v / tps;
-            change_occurred = true;
-        });
-
-        if change_occurred {
             self.translation_matrix = None;
             self.model_matrix = None;
-        }
+        });
     }
 
     fn advance_rotation(&mut self) {
@@ -163,9 +156,21 @@ impl ModelTransforms {
     fn get_intr_rotation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         use crate::settings::TICKS_PER_SECOND as tps;
         if self.motion.is_rotating() {
-            let r_x = cgmath::Matrix4::from_angle_x(self.motion.get_intr_rotation_speed_x(i_v).map_or_else(|| self.rotation_x, |r| self.rotation_x + r / tps));
-            let r_y = cgmath::Matrix4::from_angle_y(self.motion.get_intr_rotation_speed_y(i_v).map_or_else(|| self.rotation_y, |r| self.rotation_y + r / tps));
-            let r_z = cgmath::Matrix4::from_angle_z(self.motion.get_intr_rotation_speed_z(i_v).map_or_else(|| self.rotation_z, |r| self.rotation_z + r / tps));
+            let r_x = cgmath::Matrix4::from_angle_x(
+                self.motion
+                    .get_intr_rotation_speed_x(i_v)
+                    .map_or_else(|| self.rotation_x, |r| self.rotation_x + r / tps),
+            );
+            let r_y = cgmath::Matrix4::from_angle_y(
+                self.motion
+                    .get_intr_rotation_speed_y(i_v)
+                    .map_or_else(|| self.rotation_y, |r| self.rotation_y + r / tps),
+            );
+            let r_z = cgmath::Matrix4::from_angle_z(
+                self.motion
+                    .get_intr_rotation_speed_z(i_v)
+                    .map_or_else(|| self.rotation_z, |r| self.rotation_z + r / tps),
+            );
             r_z * r_y * r_x
         } else {
             self.get_rotation_matrix()
@@ -175,7 +180,9 @@ impl ModelTransforms {
     fn get_intr_translation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         use crate::settings::TICKS_PER_SECOND as tps;
         if self.motion.is_moving() {
-            return cgmath::Matrix4::from_translation(self.translation + self.motion.get_intr_movement(i_v) / tps);
+            return cgmath::Matrix4::from_translation(
+                self.translation + self.motion.get_intr_movement(i_v) / tps,
+            );
         } else {
             self.get_translation_matrix()
         }
@@ -220,31 +227,4 @@ impl ModelTransforms {
     pub fn get_translation(&self) -> Vector3<f32> {
         self.translation
     }
-
 }
-/*
-use crate::game::item::loader;
-
-pub fn triangle() -> Model {
-    let mesh = loader::load_collada_mesh(include_str!("res/untitled.dae"));
-
-    Model {
-        mesh,
-        translation: Vector3 {
-            x: 0.0,
-            y: 0.0,
-            z: 0.0,
-        },
-        rotation_x: Rad(-PI / 2.0),
-        rotation_y: Rad(0.0),
-        rotation_z: Rad(0.0),
-        scale: 1.0,
-        scale_matrix: None,
-        model_matrix: None,
-        motion: motion::new_motion(),
-        texture: loader::load_texture("./src/game/model/res/Untitled.001.png"),
-        rotation_matrix: None,
-        translation_matrix: None,
-    }
-}
-*/

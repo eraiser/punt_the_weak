@@ -3,8 +3,6 @@ use glutin::event_loop::EventLoop;
 use glutin::window::Window;
 use glutin::{ContextWrapper, PossiblyCurrent};
 
-
-
 pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<PossiblyCurrent, Window>) {
     let event_loop = glutin::event_loop::EventLoop::new_user_event();
     let wb = glutin::window::WindowBuilder::new().with_title(settings::WINDOW_LABEL);
@@ -44,7 +42,6 @@ pub fn new_fps_ups_counter() -> FpsUpsCounter {
         ups_counter: 0,
     }
 }
-
 
 impl FpsUpsCounter {
     pub fn advance_fps(&mut self) {

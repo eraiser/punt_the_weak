@@ -1,4 +1,3 @@
-
 #[derive(Clone)]
 pub struct Mesh {
     texture: gl::types::GLuint,
@@ -13,13 +12,12 @@ pub struct Mesh {
 use gl::types::*;
 use std::ptr;
 
-
 pub fn new_untextured_mesh(
     vertex_data: Vec<f32>,
     normal_data: Vec<f32>,
     uv_data: Vec<f32>,
-    indices: Vec<i16>) -> Mesh {
-
+    indices: Vec<i16>,
+) -> Mesh {
     let mut vertex_array_id = 0;
     unsafe {
         gl::GenVertexArrays(1, &mut vertex_array_id);
@@ -34,10 +32,11 @@ pub fn new_untextured_mesh(
     unsafe {
         gl::GenBuffers(1, &mut element_buffer_id);
         gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, element_buffer_id);
-        gl::BufferData(gl::ELEMENT_ARRAY_BUFFER,
-                       (indices.len() * std::mem::size_of::<GLshort>()) as GLsizeiptr,
-                       std::mem::transmute(&indices[0]),
-                       gl::STATIC_DRAW,
+        gl::BufferData(
+            gl::ELEMENT_ARRAY_BUFFER,
+            (indices.len() * std::mem::size_of::<GLshort>()) as GLsizeiptr,
+            std::mem::transmute(&indices[0]),
+            gl::STATIC_DRAW,
         );
     }
     let vertex_count = indices.len() as i32;
@@ -60,10 +59,11 @@ fn fill_buffer(buffer_data: Vec<f32>) -> u32 {
         // Create a Vertex Buffer Object and copy the vertex data to it
         gl::GenBuffers(1, &mut buffer_id);
         gl::BindBuffer(gl::ARRAY_BUFFER, buffer_id);
-        gl::BufferData(gl::ARRAY_BUFFER,
-                       (buffer_data.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
-                       std::mem::transmute(&buffer_data[0]),
-                       gl::STATIC_DRAW,
+        gl::BufferData(
+            gl::ARRAY_BUFFER,
+            (buffer_data.len() * std::mem::size_of::<GLfloat>()) as GLsizeiptr,
+            std::mem::transmute(&buffer_data[0]),
+            gl::STATIC_DRAW,
         );
     }
 
@@ -73,7 +73,12 @@ fn fill_buffer(buffer_data: Vec<f32>) -> u32 {
 impl Mesh {
     pub fn draw(&self) {
         unsafe {
-            gl::DrawElements(gl::TRIANGLES, self.vertex_count, gl::UNSIGNED_SHORT, ptr::null());
+            gl::DrawElements(
+                gl::TRIANGLES,
+                self.vertex_count,
+                gl::UNSIGNED_SHORT,
+                ptr::null(),
+            );
         }
     }
 
@@ -106,7 +111,7 @@ impl Mesh {
     pub fn set_texture(&mut self, t: u32) {
         self.texture = t;
     }
-    pub fn get_texture(&self) -> u32{
+    pub fn get_texture(&self) -> u32 {
         self.texture
     }
 

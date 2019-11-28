@@ -5,24 +5,36 @@ pub fn load_texture(path: &str) -> u32 {
 
     let im = match im {
         image::DynamicImage::ImageRgba8(img) => img,
-        img => img.to_rgba()
+        img => img.to_rgba(),
     };
-
 
     let dim = im.dimensions();
 
     unsafe {
         gl::GenTextures(1, &mut texture);
         gl::BindTexture(gl::TEXTURE_2D, texture);
-        gl::TexImage2D(gl::TEXTURE_2D, 0, gl::RGB as i32, dim.0 as i32, dim.1 as i32, 0, gl::RGBA, gl::UNSIGNED_BYTE,
-                       im.into_raw().as_ptr() as *mut std::ffi::c_void );
+        gl::TexImage2D(
+            gl::TEXTURE_2D,
+            0,
+            gl::RGB as i32,
+            dim.0 as i32,
+            dim.1 as i32,
+            0,
+            gl::RGBA,
+            gl::UNSIGNED_BYTE,
+            im.into_raw().as_ptr() as *mut std::ffi::c_void,
+        );
 
         // ... nice trilinear filtering ...
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_S, gl::REPEAT as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_WRAP_T, gl::REPEAT as i32);
         gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MAG_FILTER, gl::LINEAR as i32);
 
-        gl::TexParameteri(gl::TEXTURE_2D, gl::TEXTURE_MIN_FILTER, gl::LINEAR_MIPMAP_LINEAR as i32);
+        gl::TexParameteri(
+            gl::TEXTURE_2D,
+            gl::TEXTURE_MIN_FILTER,
+            gl::LINEAR_MIPMAP_LINEAR as i32,
+        );
         // ... which requires mipmaps. Generate them automatically.
         gl::GenerateMipmap(gl::TEXTURE_2D);
     }
@@ -32,9 +44,7 @@ pub fn load_texture(path: &str) -> u32 {
 use crate::game::item::mesh;
 use crate::game::item::mesh::Mesh;
 
-
 pub fn load_collada_mesh(path: &str) -> Mesh {
-
     let path = Path::new(path);
 
     let doc = collada::document::ColladaDocument::from_path(path).unwrap();
@@ -47,7 +57,6 @@ pub fn load_collada_mesh(path: &str) -> Mesh {
 
     let prim_el = &obj_data.geometry[0].mesh[0];
 
-
     let indices = match prim_el {
         collada::PrimitiveElement::Triangles(t) => t,
         _ => {
@@ -55,23 +64,25 @@ pub fn load_collada_mesh(path: &str) -> Mesh {
         }
     };
 
-    let (vert,
-        tex,
-        norm,
-        int) = fill_vtn_vectors(vertices_indexed
-                                , texture_data_indexed
-                                , normals_indexed
-                                , indices);
-
+    let (vert, tex, norm, int) = fill_vtn_vectors(
+        vertices_indexed,
+        texture_data_indexed,
+        normals_indexed,
+        indices,
+    );
 
     mesh::new_untextured_mesh(vert, norm, tex, int)
 }
 
-use collada::{Vertex, TVertex, Triangles};
+use collada::{TVertex, Triangles, Vertex};
 use std::path::Path;
 
-fn fill_vtn_vectors(vertices_indexed: &Vec<Vertex>, texture_data_indexed: &Vec<TVertex>, normals_indexed: &Vec<Vertex>, indices: &Triangles)
-                    -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
+fn fill_vtn_vectors(
+    vertices_indexed: &Vec<Vertex>,
+    texture_data_indexed: &Vec<TVertex>,
+    normals_indexed: &Vec<Vertex>,
+    indices: &Triangles,
+) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
     let mut vert = Vec::new();
     let mut tex = Vec::new();
     let mut norm = Vec::new();
@@ -122,7 +133,6 @@ fn fill_vtn_vectors(vertices_indexed: &Vec<Vertex>, texture_data_indexed: &Vec<T
         norm.push(normals_indexed[n_i_2].y as f32);
         norm.push(normals_indexed[n_i_2].z as f32);
 
-
         int.push(i);
         int.push(i + 1);
         int.push(i + 2);
@@ -131,5 +141,3 @@ fn fill_vtn_vectors(vertices_indexed: &Vec<Vertex>, texture_data_indexed: &Vec<T
 
     (vert, tex, norm, int)
 }
-
-

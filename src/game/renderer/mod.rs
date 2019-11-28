@@ -1,4 +1,3 @@
-
 use cgmath::{Matrix4, Vector3};
 use gl::types::*;
 use std::os::raw::c_float;
@@ -16,7 +15,6 @@ pub struct Renderer {
     mvp_location: GLint,
     texture_location: GLint,
 }
-
 
 impl Renderer {
     pub fn use_3d_program(&self) {
@@ -46,8 +44,7 @@ impl Renderer {
                 self.v_location,
                 1,
                 gl::FALSE,
-                cgmath::conv::array4x4(m_matrix).as_ptr()
-                    as *const GLfloat,
+                cgmath::conv::array4x4(m_matrix).as_ptr() as *const GLfloat,
             )
         }
     }
@@ -57,45 +54,45 @@ impl Renderer {
                 self.m_location,
                 1,
                 gl::FALSE,
-                cgmath::conv::array4x4(v_matrix).as_ptr()
-                    as *const GLfloat,
+                cgmath::conv::array4x4(v_matrix).as_ptr() as *const GLfloat,
             )
         }
     }
-    pub fn set_uniform_light_positions_worldspace(&self, light_positions: [Vector3<f32>;MAX_LIGHTS]) {
-
+    pub fn set_uniform_light_positions_worldspace(
+        &self,
+        light_positions: [Vector3<f32>; MAX_LIGHTS],
+    ) {
         unsafe {
             gl::Uniform3fv(
                 self.light_positions_location,
                 MAX_LIGHTS as i32,
-                light_positions.as_ptr() as *const GLfloat
+                light_positions.as_ptr() as *const GLfloat,
             )
         }
     }
-    pub fn set_uniform_light_colors(&self, light_colors: [Vector3<f32>;MAX_LIGHTS]) {
-
+    pub fn set_uniform_light_colors(&self, light_colors: [Vector3<f32>; MAX_LIGHTS]) {
         unsafe {
             gl::Uniform3fv(
                 self.light_colors_location,
                 MAX_LIGHTS as i32,
-                light_colors.as_ptr() as *const GLfloat
+                light_colors.as_ptr() as *const GLfloat,
             )
         }
     }
-    pub fn set_uniform_light_powers(&self, light_powers: [f32;MAX_LIGHTS]) {
+    pub fn set_uniform_light_powers(&self, light_powers: [f32; MAX_LIGHTS]) {
         unsafe {
             gl::Uniform1fv(
                 self.light_powers_location,
                 MAX_LIGHTS as i32,
-                light_powers.as_ptr() as *const GLfloat
+                light_powers.as_ptr() as *const GLfloat,
             )
         }
     }
-    pub fn set_texture(&self,texture: GLuint ){
-        unsafe{
+    pub fn set_texture(&self, texture: GLuint) {
+        unsafe {
             gl::ActiveTexture(gl::TEXTURE0);
-		    gl::BindTexture(gl::TEXTURE_2D, texture);
-		    gl::Uniform1i(self.texture_location, 0);
+            gl::BindTexture(gl::TEXTURE_2D, texture);
+            gl::Uniform1i(self.texture_location, 0);
         }
     }
 }
@@ -103,10 +100,14 @@ impl Renderer {
 mod shader_utilities;
 
 pub fn init_renderer() -> Renderer {
-    let vs_3d =
-        shader_utilities::compile_shader(include_str!("shader/StandardVertShading.glsl"), gl::VERTEX_SHADER);
-    let fs =
-        shader_utilities::compile_shader(include_str!("shader/StandardFragShading.glsl"), gl::FRAGMENT_SHADER);
+    let vs_3d = shader_utilities::compile_shader(
+        include_str!("shader/StandardVertShading.glsl"),
+        gl::VERTEX_SHADER,
+    );
+    let fs = shader_utilities::compile_shader(
+        include_str!("shader/StandardFragShading.glsl"),
+        gl::FRAGMENT_SHADER,
+    );
 
     let shader_program_3d = shader_utilities::link_program(vs_3d, fs);
 
@@ -131,15 +132,30 @@ pub fn init_renderer() -> Renderer {
         unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("V").unwrap().as_ptr()) };
     let m_location: GLint =
         unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("M").unwrap().as_ptr()) };
-    let light_positions_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("LightPositions_worldspace").unwrap().as_ptr()) };
-    let light_colors_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("LightColors").unwrap().as_ptr()) };
-    let light_powers_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("LightPowers").unwrap().as_ptr()) };
-    let texture_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("myTextureSampler").unwrap().as_ptr()) };
-
+    let light_positions_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_3d,
+            CString::new("LightPositions_worldspace").unwrap().as_ptr(),
+        )
+    };
+    let light_colors_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_3d,
+            CString::new("LightColors").unwrap().as_ptr(),
+        )
+    };
+    let light_powers_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_3d,
+            CString::new("LightPowers").unwrap().as_ptr(),
+        )
+    };
+    let texture_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_3d,
+            CString::new("myTextureSampler").unwrap().as_ptr(),
+        )
+    };
 
     Renderer {
         shader_program_3d,
@@ -150,6 +166,6 @@ pub fn init_renderer() -> Renderer {
         m_location,
         v_location,
         mvp_location,
-        texture_location
+        texture_location,
     }
 }

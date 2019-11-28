@@ -18,7 +18,6 @@ pub fn new_controls() -> Controls {
     }
 }
 
-
 use cgmath::prelude::InnerSpace;
 use cgmath::{Matrix3, Rad, Vector3};
 impl Controls {
