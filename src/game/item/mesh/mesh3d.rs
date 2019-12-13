@@ -1,5 +1,7 @@
 use std::ptr;
+
 use gl::types::*;
+
 pub struct Mesh3D {
     texture: gl::types::GLuint,
     vertex_array_id: gl::types::GLuint,

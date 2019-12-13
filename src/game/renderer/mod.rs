@@ -3,11 +3,10 @@ use gl::types::*;
 
 use crate::settings::MAX_LIGHTS;
 
-mod font;
-
 pub struct Renderer {
     perspective_matrix: cgmath::Matrix4<f32>,
     shader_program_3d: GLuint,
+    shader_program_2d: GLuint,
     light_positions_location: GLint,
     light_colors_location: GLint,
     light_powers_location: GLint,
@@ -23,9 +22,15 @@ impl Renderer {
             gl::UseProgram(self.shader_program_3d);
         }
     }
+    pub fn use_2d_program(&self) {
+        unsafe {
+            gl::UseProgram(self.shader_program_2d);
+        }
+    }
     pub fn cleanup(&self) {
         unsafe {
             gl::DeleteProgram(self.shader_program_3d);
+            gl::DeleteProgram(self.shader_program_2d);
         }
     }
     pub fn set_uniform_mvp(&self, m_matrix: Matrix4<f32>, v_matrix: Matrix4<f32>) {
@@ -102,22 +107,36 @@ mod shader_utilities;
 
 pub fn init_renderer() -> Renderer {
 
-    let f = font::FontData::load_font();
-
     let vs_3d = shader_utilities::compile_shader(
         include_str!("shader/StandardVertShading.glsl"),
         gl::VERTEX_SHADER,
     );
-    let fs = shader_utilities::compile_shader(
+    let fs_3d = shader_utilities::compile_shader(
         include_str!("shader/StandardFragShading.glsl"),
         gl::FRAGMENT_SHADER,
     );
 
-    let shader_program_3d = shader_utilities::link_program(vs_3d, fs);
+    let shader_program_3d = shader_utilities::link_program(vs_3d, fs_3d);
 
     unsafe {
-        gl::DeleteShader(fs);
+        gl::DeleteShader(fs_3d);
         gl::DeleteShader(vs_3d);
+    }
+
+    let vs_2d = shader_utilities::compile_shader(
+        include_str!("shader/VertexShader2d.glsl"),
+        gl::VERTEX_SHADER,
+    );
+    let fs_2d = shader_utilities::compile_shader(
+        include_str!("shader/FragmentShader2d.glsl"),
+        gl::FRAGMENT_SHADER,
+    );
+
+    let shader_program_2d = shader_utilities::link_program(vs_2d, fs_2d);
+
+    unsafe {
+        gl::DeleteShader(fs_2d);
+        gl::DeleteShader(vs_2d);
     }
 
     let perspective_matrix: Matrix4<f32> = {
@@ -171,5 +190,6 @@ pub fn init_renderer() -> Renderer {
         v_location,
         mvp_location,
         texture_location,
+        shader_program_2d
     }
 }
