@@ -1,7 +1,12 @@
+use std::f32::consts::PI;
+
 use cgmath::{InnerSpace, Point3, Vector3};
 use glutin::event::KeyboardInput;
 use glutin::event_loop::ControlFlow;
 use glutin::window::Window;
+
+use crate::game::GameMode::Menu;
+use crate::settings::*;
 
 mod renderer;
 
@@ -9,10 +14,6 @@ mod controls;
 mod view;
 
 mod item;
-
-use crate::game::GameMode::Menu;
-use crate::settings::*;
-use std::f32::consts::PI;
 
 enum GameMode {
     Menu,
@@ -26,6 +27,7 @@ pub struct Game {
     controls: controls::Controls,
     game_mode: GameMode,
     game_mode_changed: bool,
+    text_2d: item::mesh::texture2d::Texture2D
 }
 
 pub fn new_game() -> Game {
@@ -46,6 +48,7 @@ pub fn new_game() -> Game {
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
         game_mode_changed: true,
+        text_2d: item::mesh::new_2d_text("2222 22222")
     }
 }
 
@@ -298,8 +301,15 @@ impl Game {
 
                 m.1.draw();
             }
+
             m.1.disable_buffers();
         }
+
+        self.renderer.use_2d_program();
+        self.renderer.set_texture(self.text_2d.texture);
+        self.text_2d.enable_buffers();
+        self.text_2d.draw();
+        self.text_2d.disable_buffers();
     }
 
     pub fn cleanup(&self) {

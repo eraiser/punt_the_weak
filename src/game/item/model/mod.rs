@@ -1,6 +1,8 @@
-pub mod motion;
+use std::f32::consts::PI;
 
 use cgmath::{Matrix4, Rad, SquareMatrix, Vector3};
+
+pub mod motion;
 
 pub struct ModelTransforms {
     rotation_x: Rad<f32>,
@@ -36,7 +38,6 @@ pub fn new_model_transform() -> ModelTransforms {
     }
 }
 
-use std::f32::consts::PI;
 pub const TWO_PI: Rad<f32> = Rad(2.0 * PI);
 
 impl ModelTransforms {

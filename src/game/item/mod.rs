@@ -1,15 +1,16 @@
+use std::collections::HashMap;
+
+use cgmath::Vector3;
+use rayon::iter::ParallelIterator;
+use rayon::prelude::IntoParallelRefMutIterator;
+
+use crate::settings::MAX_LIGHTS;
+
 pub mod lighting;
-mod mesh;
+pub mod mesh;
 mod model;
 
 pub mod loader;
-
-use cgmath::Vector3;
-use std::collections::HashMap;
-
-use crate::settings::MAX_LIGHTS;
-use rayon::iter::ParallelIterator;
-use rayon::prelude::IntoParallelRefMutIterator;
 
 /*
 model_sets is a Vector that represents models with the same mesh and texture

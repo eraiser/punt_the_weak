@@ -5,13 +5,14 @@ extern crate image;
 extern crate rand;
 extern crate rayon;
 
+use glutin::dpi::LogicalPosition;
+
+use settings::*;
+
 mod game;
 mod window_utilities;
 
 mod settings;
-
-use glutin::dpi::LogicalPosition;
-use settings::*;
 
 fn main() {
     let (event_loop, windowed_context) = window_utilities::initialize_window(VSYNC);

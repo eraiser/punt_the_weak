@@ -1,7 +1,10 @@
-use crate::settings;
+use std::time::{Duration, Instant};
+
+use glutin::{ContextWrapper, PossiblyCurrent};
 use glutin::event_loop::EventLoop;
 use glutin::window::Window;
-use glutin::{ContextWrapper, PossiblyCurrent};
+
+use crate::settings;
 
 pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<PossiblyCurrent, Window>) {
     let event_loop = glutin::event_loop::EventLoop::new_user_event();
@@ -24,8 +27,6 @@ pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<Possibly
     }
     (event_loop, windowed_context)
 }
-
-use std::time::{Duration, Instant};
 
 static ONE_SEC: Duration = Duration::from_secs(1);
 

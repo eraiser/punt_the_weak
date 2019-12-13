@@ -1,3 +1,9 @@
+use std::path::Path;
+
+use collada::{Triangles, TVertex, Vertex};
+
+use crate::game::item::mesh;
+
 pub fn load_texture(path: &str) -> u32 {
     let mut texture = 0;
 
@@ -41,8 +47,6 @@ pub fn load_texture(path: &str) -> u32 {
     texture
 }
 
-use crate::game::item::mesh;
-
 pub fn load_collada_data(path: &str) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
     let path = Path::new(path);
 
@@ -70,9 +74,6 @@ pub fn load_collada_data(path: &str) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>)
         indices,
     )
 }
-
-use collada::{TVertex, Triangles, Vertex};
-use std::path::Path;
 
 fn fill_vnt_vectors(
     vertices_indexed: &Vec<Vertex>,

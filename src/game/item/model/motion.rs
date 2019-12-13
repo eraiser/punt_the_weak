@@ -1,4 +1,5 @@
 use cgmath::{Rad, Vector3};
+
 pub struct Motion {
     // Units/sec
     pub movement_vector: Option<Vector3<f32>>,

@@ -1,3 +1,6 @@
+use cgmath::{Matrix3, Rad, Vector3};
+use cgmath::prelude::InnerSpace;
+
 pub struct Controls {
     pub forward: bool,
     pub backward: bool,
@@ -18,8 +21,6 @@ pub fn new_controls() -> Controls {
     }
 }
 
-use cgmath::prelude::InnerSpace;
-use cgmath::{Matrix3, Rad, Vector3};
 impl Controls {
     pub fn reset(&mut self) {
         self.forward = false;
