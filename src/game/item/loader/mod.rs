@@ -42,9 +42,8 @@ pub fn load_texture(path: &str) -> u32 {
 }
 
 use crate::game::item::mesh;
-use crate::game::item::mesh::Mesh;
 
-pub fn load_collada_mesh(path: &str) -> Mesh {
+pub fn load_collada_data(path: &str) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
     let path = Path::new(path);
 
     let doc = collada::document::ColladaDocument::from_path(path).unwrap();
@@ -60,24 +59,22 @@ pub fn load_collada_mesh(path: &str) -> Mesh {
     let indices = match prim_el {
         collada::PrimitiveElement::Triangles(t) => t,
         _ => {
-            panic!();
+            panic!("No Triangles");
         }
     };
 
-    let (vert, tex, norm, int) = fill_vtn_vectors(
+    fill_vnt_vectors(
         vertices_indexed,
         texture_data_indexed,
         normals_indexed,
         indices,
-    );
-
-    mesh::new_untextured_mesh(vert, norm, tex, int)
+    )
 }
 
 use collada::{TVertex, Triangles, Vertex};
 use std::path::Path;
 
-fn fill_vtn_vectors(
+fn fill_vnt_vectors(
     vertices_indexed: &Vec<Vertex>,
     texture_data_indexed: &Vec<TVertex>,
     normals_indexed: &Vec<Vertex>,
@@ -139,5 +136,5 @@ fn fill_vtn_vectors(
         i += 3;
     }
 
-    (vert, tex, norm, int)
+    (vert, norm, tex, int)
 }

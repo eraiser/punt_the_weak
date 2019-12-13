@@ -1,8 +1,9 @@
 use cgmath::{Matrix4, Vector3};
 use gl::types::*;
-use std::os::raw::c_float;
 
 use crate::settings::MAX_LIGHTS;
+
+mod font;
 
 pub struct Renderer {
     perspective_matrix: cgmath::Matrix4<f32>,
@@ -100,6 +101,9 @@ impl Renderer {
 mod shader_utilities;
 
 pub fn init_renderer() -> Renderer {
+
+    let f = font::FontData::load_font();
+
     let vs_3d = shader_utilities::compile_shader(
         include_str!("shader/StandardVertShading.glsl"),
         gl::VERTEX_SHADER,
@@ -153,7 +157,7 @@ pub fn init_renderer() -> Renderer {
     let texture_location: GLint = unsafe {
         gl::GetUniformLocation(
             shader_program_3d,
-            CString::new("myTextureSampler").unwrap().as_ptr(),
+            CString::new("TextureSampler").unwrap().as_ptr(),
         )
     };
 

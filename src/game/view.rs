@@ -7,7 +7,6 @@ pub struct Camera {
     x_rotation: Rad<f32>,
     y_rotation: Rad<f32>,
     rotation_matrix: Option<Matrix3<f32>>,
-    interpolated_step: Option<Vector3<f32>>,
     move_direction: Option<Vector3<f32>>,
     up: Vector3<f32>,
     speed: f32,
@@ -22,7 +21,6 @@ pub fn new_camera(position: Point3<f32>, look_direction: Vector3<f32>) -> Camera
         x_rotation: Rad(0.0),
         y_rotation: Rad(0.0),
         rotation_matrix: None,
-        interpolated_step: None,
         move_direction: None,
         up,
         speed: 2.0,
@@ -34,17 +32,16 @@ impl Camera {
         match self.move_direction {
             Some(m_d) => {
                 let is = m_d * i_v;
-                self.interpolated_step = Some(is.clone());
 
                 Matrix4::look_at_dir(
                     self.position + is,
-                    self.get_rotation() * self.look_direction,
+                    self.get_rotation_matrix() * self.look_direction,
                     self.up,
                 )
             }
             None => Matrix4::look_at_dir(
                 self.position,
-                self.get_rotation() * self.look_direction,
+                self.get_rotation_matrix() * self.look_direction,
                 self.up,
             ),
         }
@@ -69,7 +66,7 @@ impl Camera {
         self.current_direction = None;
     }
 
-    fn get_rotation(&mut self) -> Matrix3<f32> {
+    fn get_rotation_matrix(&mut self) -> Matrix3<f32> {
         match self.rotation_matrix {
             Some(m) => return m,
             None => {
@@ -85,7 +82,7 @@ impl Camera {
         match self.current_direction {
             Some(v) => return v,
             None => {
-                let v = self.get_rotation() * self.look_direction;
+                let v = self.get_rotation_matrix() * self.look_direction;
                 self.current_direction = Some(v);
                 v
             }

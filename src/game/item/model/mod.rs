@@ -36,6 +36,9 @@ pub fn new_model_transform() -> ModelTransforms {
     }
 }
 
+use std::f32::consts::PI;
+pub const TWO_PI: Rad<f32> = Rad(2.0 * PI);
+
 impl ModelTransforms {
     pub fn rotate_x(&mut self, angle: f32) {
         self.rotation_x += Rad(angle);
@@ -76,17 +79,14 @@ impl ModelTransforms {
     }
 
     fn trim_angel(&mut self) {
-        use std::f32::consts::PI;
-
-        let two_pi = Rad(2.0 * PI);
-        if self.rotation_x > two_pi {
-            self.rotation_x -= Rad(2.0 * PI)
+        if self.rotation_x > TWO_PI {
+            self.rotation_x -= TWO_PI
         }
-        if self.rotation_y > two_pi {
-            self.rotation_y -= Rad(2.0 * PI)
+        if self.rotation_y > TWO_PI {
+            self.rotation_y -= TWO_PI
         }
-        if self.rotation_z > two_pi {
-            self.rotation_z -= Rad(2.0 * PI)
+        if self.rotation_z > TWO_PI {
+            self.rotation_z -= TWO_PI
         }
     }
 

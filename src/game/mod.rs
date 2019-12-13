@@ -56,7 +56,7 @@ impl Game {
         let speed: f32 = 5.0;
         let mut rng = rand::thread_rng();
 
-        for x in 0..10000 {
+        for _x in 0..10 {
             let r = self.item_handler.add_new_model("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/ball.dae",
                                                     "C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/Untitled.001.png");
             r.translate(Vector3 {
@@ -70,8 +70,6 @@ impl Game {
                 y: (rng.gen::<f32>() * speed) - (speed / 2.0),
                 z: (rng.gen::<f32>() * speed) - (speed / 2.0),
             };
-
-            println!("{:?}", v);
 
             v = v.normalize();
 

@@ -2,7 +2,7 @@ pub mod lighting;
 mod mesh;
 mod model;
 
-mod loader;
+pub mod loader;
 
 use cgmath::Vector3;
 use std::collections::HashMap;
@@ -21,7 +21,7 @@ an element in model_sets. The key is the file path.
 */
 
 pub struct ItemHandler {
-    pub model_sets: Vec<(Vec<model::ModelTransforms>, mesh::Mesh)>,
+    pub model_sets: Vec<(Vec<model::ModelTransforms>, mesh::mesh3d::Mesh3D)>,
     model_map: HashMap<String, usize>,
     pub light_sorces: Vec<lighting::LightSource>,
 }
@@ -47,7 +47,8 @@ impl ItemHandler {
             None => {
                 let transform_vec = Vec::new();
 
-                let mut mesh = loader::load_collada_mesh(collada_path);
+                let mesh_data = loader::load_collada_data(collada_path);
+                let mut mesh = mesh::new_untextured_mesh(mesh_data.0,mesh_data.1,mesh_data.2,mesh_data.3);
                 let texture = loader::load_texture(image_path);
                 mesh.set_texture(texture);
 
