@@ -27,7 +27,7 @@ pub struct Game {
     controls: controls::Controls,
     game_mode: GameMode,
     game_mode_changed: bool,
-    text_2d: item::mesh::texture2d::Texture2D
+    text_2d: item::mesh::sprite2d::Sprite2D
 }
 
 pub fn new_game() -> Game {
@@ -48,7 +48,7 @@ pub fn new_game() -> Game {
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
         game_mode_changed: true,
-        text_2d: item::mesh::new_2d_text("2222 22222")
+        text_2d: item::mesh::new_2d_text("Hello World!\nU gay")
     }
 }
 

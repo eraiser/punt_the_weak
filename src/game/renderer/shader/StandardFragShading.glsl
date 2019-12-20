@@ -9,7 +9,7 @@ in vec3 EyeDirection_cameraspace;
 in vec3 LightDirection_cameraspace[MAX_LIGHTS];
 
 // Ouput data
-out vec3 color;
+out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
@@ -73,12 +73,12 @@ void main(){
 	}
 
 	//TotalDiffuseColor = max(TotalDiffuseColor, 0.2);
-	
-	color = 
-		// Ambient : simulates indirect lighting
-		MaterialAmbientColor +
-		TotalDiffuseColor +
-		TotalSpecularColor;
+
+
+	// Ambient : simulates indirect lighting
+	color = vec4(MaterialAmbientColor + TotalDiffuseColor + TotalSpecularColor , 1.0);
+
+
 
 
 }

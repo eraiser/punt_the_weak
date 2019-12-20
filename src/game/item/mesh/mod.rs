@@ -7,7 +7,7 @@ use mesh3d::Mesh3D;
 use crate::game::item::loader::load_texture;
 
 pub mod mesh3d;
-pub mod texture2d;
+pub mod sprite2d;
 pub mod font;
 
 pub fn new_untextured_mesh(
@@ -41,7 +41,7 @@ pub fn new_untextured_mesh(
     mesh3d::new_mesh_3d(vertex_array_id,vertex_buffer_id,uv_buffer_id,normal_buffer_id,element_buffer_id,vertex_count)
 }
 
-pub fn new_2d_text(string: &str) -> texture2d::Texture2D {
+pub fn new_2d_text(string: &str) -> sprite2d::Sprite2D {
     let font = font::FontData::load_font();
     let (vert, uvs) = font.generate_2d_text_vert_uv_data(string);
 
@@ -50,9 +50,9 @@ pub fn new_2d_text(string: &str) -> texture2d::Texture2D {
     let vertex_buffer_id = fill_buffer(vert);
     let uv_buffer_id = fill_buffer(uvs);
 
-    let texture_id = load_texture("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/mesh/font/fonts/ExportedFont.bmp");
+    let texture_id = load_texture("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/mesh/font/fonts/ExportedFont.tga");
 
-    texture2d::new_texture_2d(texture_id, vertex_buffer_id, uv_buffer_id, vertex_count)
+    sprite2d::new_texture_2d(texture_id, vertex_buffer_id, uv_buffer_id, vertex_count)
 }
 
 fn fill_buffer(buffer_data: Vec<f32>) -> u32 {

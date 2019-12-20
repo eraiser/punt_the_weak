@@ -57,8 +57,14 @@ impl FontData {
                     let w2 = temp.next().unwrap();
                     let v = (temp.next().unwrap()).parse::<f32>().unwrap();
                     match w2 {
-                        "Width" => fd.cell_width = v,
-                        "Height" => fd.cell_height = v,
+                        "Width" => {
+                            fd.cell_width = v;
+                            fd.rows = (fd.image_width / fd.cell_width) as u16;
+                        },
+                        "Height" => {
+                            fd.cell_height = v;
+                            fd.lines = (fd.image_height / fd.cell_height) as u16;
+                        },
                         _ => ()
                     }
                 }
@@ -82,17 +88,17 @@ impl FontData {
                     }
                 }
                 "Char" => {
-                    words.next();
+                    let v = (words.next().unwrap()).parse::<u16>().unwrap();
                     let w2: &str = words.next().unwrap();
                     if !(w2.starts_with("Base")) {
-                        fd.lines = (fd.image_height / fd.cell_height) as u16;
-                        fd.rows = (fd.image_width / fd.cell_width) as u16;
-                        return fd;
+                        break;
                     } else {
-                        let mut temp = words.next().unwrap().split(',');
-                        temp.next();
-                        let v = (temp.next().unwrap()).parse::<u16>().unwrap();
-                        fd.widths.push(v as f32);
+                        if v >= fd.start_char{
+                            let mut temp = words.next().unwrap().split(',');
+                            temp.next();
+                            let v = (temp.next().unwrap()).parse::<u16>().unwrap();
+                            fd.widths.push(v as f32);
+                        }
                     }
                 }
                 _ => ()
@@ -114,27 +120,31 @@ impl FontData {
         };
         for c in string.chars() {
             if c.is_ascii() {
+                if c == '\n' {
+                    cursor.x = 0.0;
+                    cursor.y = cursor.y - self.font_height;
+                    continue;
+                }
                 let code: usize = ((c as u16) - self.start_char) as usize;
 
                 let char_width = *self.widths.get(code).unwrap();
-
                 let up_left = cursor;
 
                 let up_right = Vector2 {
                     x: (cursor.x + char_width),
                     y: cursor.y,
-                };
+                }/self.font_height;
                 let down_left = Vector2 {
                     x: cursor.x,
-                    y: cursor.y + self.font_height,
-                };
+                    y: (cursor.y + self.font_height),
+                }/self.font_height;
                 let down_right = Vector2 {
                     x: (cursor.x + char_width),
-                    y: cursor.y + self.font_height,
-                };
+                    y: (cursor.y + self.font_height),
+                }/self.font_height;
 
-                vertices.push(up_left.x);
-                vertices.push(up_left.y);
+                vertices.push(up_left.x/self.font_height);
+                vertices.push(up_left.y/self.font_height);
                 vertices.push(down_left.x);
                 vertices.push(down_left.y);
                 vertices.push(up_right.x);
@@ -148,7 +158,7 @@ impl FontData {
                 vertices.push(down_left.y);
 
 
-                cursor.x = cursor.x + char_width;
+                cursor.x = cursor.x + (char_width);
 
 
                 let mut uv_up_left;

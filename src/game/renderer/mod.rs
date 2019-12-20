@@ -124,11 +124,11 @@ pub fn init_renderer() -> Renderer {
     }
 
     let vs_2d = shader_utilities::compile_shader(
-        include_str!("shader/VertexShader2d.glsl"),
+        include_str!("shader/2dVertexShader.glsl"),
         gl::VERTEX_SHADER,
     );
     let fs_2d = shader_utilities::compile_shader(
-        include_str!("shader/FragmentShader2d.glsl"),
+        include_str!("shader/2dFragmentShader.glsl"),
         gl::FRAGMENT_SHADER,
     );
 

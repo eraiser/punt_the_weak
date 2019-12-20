@@ -2,7 +2,7 @@ use std::ptr;
 
 use gl::types::*;
 
-pub struct Texture2D {
+pub struct Sprite2D {
     pub texture: gl::types::GLuint,
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
@@ -13,8 +13,8 @@ pub fn new_texture_2d(
     texture: gl::types::GLuint,
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
-    vertex_count: i32)  -> Texture2D {
-    Texture2D{
+    vertex_count: i32)  -> Sprite2D {
+    Sprite2D {
         texture,
         vertex_buffer_id,
         uv_buffer_id,
@@ -22,7 +22,7 @@ pub fn new_texture_2d(
     }
 }
 
-impl Texture2D{
+impl Sprite2D {
 
     pub fn draw(&self) {
         unsafe {
