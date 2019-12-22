@@ -42,6 +42,7 @@ fn main() {
                 let dpi_factor = windowed_context.window().hidpi_factor();
                 windowed_context.resize(logical_size.to_physical(dpi_factor));
                 window_size = *logical_size;
+                game.handle_screen_resolution_change(window_size.width as f32,window_size.height as f32);
                 unsafe {
                     gl::Viewport(0, 0, logical_size.width as i32, logical_size.height as i32);
                 }

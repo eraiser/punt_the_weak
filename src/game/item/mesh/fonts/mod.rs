@@ -33,7 +33,7 @@ impl FontData {
             widths: Vec::new(),
         };
 
-        let csv_file = include_str!("fonts/FontData.csv");
+        let csv_file = include_str!("FontData.csv");
 
         for line in csv_file.lines() {
             let mut words = line.split(' ');
@@ -122,7 +122,7 @@ impl FontData {
             if c.is_ascii() {
                 if c == '\n' {
                     cursor.x = 0.0;
-                    cursor.y = cursor.y - self.font_height;
+                    cursor.y = cursor.y + self.font_height;
                     continue;
                 }
                 let code: usize = ((c as u16) - self.start_char) as usize;
@@ -187,19 +187,21 @@ impl FontData {
                     x: uv_up_left.x + (char_width / self.image_width),
                     y: uv_up_left.y - (self.cell_height / self.image_height),
                 };
+
+                uvs.push(uv_up_left.x);
+                uvs.push(uv_up_left.y);
                 uvs.push(uv_down_left.x);
                 uvs.push(uv_down_left.y);
-                uvs.push(uv_up_left.x);
-                uvs.push(uv_up_left.y);
-                uvs.push(uv_down_right.x);
-                uvs.push(uv_down_right.y);
-
                 uvs.push(uv_up_right.x);
                 uvs.push(uv_up_right.y);
+
                 uvs.push(uv_down_right.x);
                 uvs.push(uv_down_right.y);
-                uvs.push(uv_up_left.x);
-                uvs.push(uv_up_left.y);
+                uvs.push(uv_up_right.x);
+                uvs.push(uv_up_right.y);
+                uvs.push(uv_down_left.x);
+                uvs.push(uv_down_left.y);
+
             }
         }
         (vertices, uvs)

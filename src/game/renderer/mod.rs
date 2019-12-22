@@ -1,10 +1,11 @@
-use cgmath::{Matrix4, Vector3};
+use cgmath::{Matrix4, Vector3, Vector2};
 use gl::types::*;
 
-use crate::settings::MAX_LIGHTS;
+use crate::settings::{MAX_LIGHTS,START_WINDOWSIZE};
 
 pub struct Renderer {
     perspective_matrix: cgmath::Matrix4<f32>,
+    ortho_matrix: cgmath::Matrix4<f32>,
     shader_program_3d: GLuint,
     shader_program_2d: GLuint,
     light_positions_location: GLint,
@@ -14,9 +15,35 @@ pub struct Renderer {
     v_location: GLint,
     mvp_location: GLint,
     texture_location: GLint,
+    o_location: GLint,
+    scale2d_location: GLint,
+    offset_screenspace_location: GLint,
+    window_dimensions_location: GLint,
 }
 
 impl Renderer {
+    pub fn handle_screen_resolution_change(&mut self, width: f32, heidht: f32)
+    {
+        let perspective_matrix: Matrix4<f32> =
+            cgmath::perspective(
+                cgmath::Rad(std::f32::consts::PI / 2.1),
+                width / heidht,
+                0.1,
+                1000.0,
+            );
+
+        let ortho_matrix: Matrix4<f32> =
+            cgmath::ortho(
+                0.0,
+                width,
+                heidht,
+                0.0,
+                0.0,
+                128.0);
+
+        self.perspective_matrix = perspective_matrix;
+        self.ortho_matrix = ortho_matrix;
+    }
     pub fn use_3d_program(&self) {
         unsafe {
             gl::UseProgram(self.shader_program_3d);
@@ -101,12 +128,48 @@ impl Renderer {
             gl::Uniform1i(self.texture_location, 0);
         }
     }
+    pub fn set_uniform_ortho(&self) {
+        unsafe {
+            gl::UniformMatrix4fv(
+                self.o_location,
+                1,
+                gl::FALSE,
+                cgmath::conv::array4x4(self.ortho_matrix).as_ptr() as *const GLfloat,
+            )
+        }
+    }
+    pub fn set_uniform_offset(&self, v: Vector2<f32>) {
+        unsafe {
+            gl::Uniform2fv(
+                self.offset_screenspace_location,
+                1,
+                cgmath::conv::array2(v).as_ptr() as *const GLfloat,
+            )
+        }
+    }
+    pub fn set_window_dimensions(&self, v: Vector2<f32>) {
+        unsafe {
+            gl::Uniform2fv(
+                self.window_dimensions_location,
+                1,
+                cgmath::conv::array2(v).as_ptr() as *const GLfloat,
+            )
+        }
+    }
+    pub fn set_uniform_scale2d(&self, s: f32) {
+        unsafe {
+            gl::Uniform1fv(
+                self.scale2d_location,
+                1,
+                &s as *const GLfloat,
+            )
+        }
+    }
 }
 
 mod shader_utilities;
 
 pub fn init_renderer() -> Renderer {
-
     let vs_3d = shader_utilities::compile_shader(
         include_str!("shader/StandardVertShading.glsl"),
         gl::VERTEX_SHADER,
@@ -139,14 +202,22 @@ pub fn init_renderer() -> Renderer {
         gl::DeleteShader(vs_2d);
     }
 
-    let perspective_matrix: Matrix4<f32> = {
+    let perspective_matrix: Matrix4<f32> =
         cgmath::perspective(
             cgmath::Rad(std::f32::consts::PI / 2.1),
-            1920.0 / 1080.0,
+            START_WINDOWSIZE.width as f32/START_WINDOWSIZE.height as f32,
             0.1,
             1000.0,
-        )
-    };
+        );
+
+    let ortho_matrix: Matrix4<f32> =
+        cgmath::ortho(
+            0.0,
+            START_WINDOWSIZE.width as f32,
+            START_WINDOWSIZE.height as f32,
+            0.0,
+            0.0,
+            128.0);
 
     use std::ffi::CString;
     let mvp_location: GLint =
@@ -180,9 +251,35 @@ pub fn init_renderer() -> Renderer {
         )
     };
 
+    let o_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_2d,
+            CString::new("O").unwrap().as_ptr(),
+        )
+    };
+    let scale2d_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_2d,
+            CString::new("scale2d").unwrap().as_ptr(),
+        )
+    };
+    let offset_screenspace_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_2d,
+            CString::new("offset_screenspace").unwrap().as_ptr(),
+        )
+    };
+    let window_dimensions_location: GLint = unsafe {
+        gl::GetUniformLocation(
+            shader_program_2d,
+            CString::new("window_dimensions").unwrap().as_ptr(),
+        )
+    };
+
     Renderer {
         shader_program_3d,
         perspective_matrix,
+        ortho_matrix,
         light_positions_location,
         light_colors_location,
         light_powers_location,
@@ -190,6 +287,10 @@ pub fn init_renderer() -> Renderer {
         v_location,
         mvp_location,
         texture_location,
-        shader_program_2d
+        shader_program_2d,
+        o_location,
+        scale2d_location,
+        offset_screenspace_location,
+        window_dimensions_location
     }
 }

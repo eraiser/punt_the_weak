@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use cgmath::{InnerSpace, Point3, Vector3};
+use cgmath::{InnerSpace, Point3, Vector3, Vector2};
 use glutin::event::KeyboardInput;
 use glutin::event_loop::ControlFlow;
 use glutin::window::Window;
@@ -27,7 +27,6 @@ pub struct Game {
     controls: controls::Controls,
     game_mode: GameMode,
     game_mode_changed: bool,
-    text_2d: item::mesh::sprite2d::Sprite2D
 }
 
 pub fn new_game() -> Game {
@@ -48,7 +47,6 @@ pub fn new_game() -> Game {
         controls: controls::new_controls(),
         game_mode: GameMode::Playing,
         game_mode_changed: true,
-        text_2d: item::mesh::new_2d_text("Hello World!\nU gay")
     }
 }
 
@@ -137,6 +135,9 @@ impl Game {
                 },
                 20.0,
             ));
+        let t = self.item_handler.add_new_sprite_string("Hello World\n123");
+        t.set_offset(Vector2{ x: 100.0, y: 200.0 });
+        t.set_scale(50.0);
     }
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
         use glutin::event::ElementState::*;
@@ -242,6 +243,11 @@ impl Game {
         }
     }
 
+    pub fn handle_screen_resolution_change(&mut self, width: f32, heidht: f32)
+    {
+        self.renderer.handle_screen_resolution_change(width,heidht);
+    }
+
     pub fn update(&mut self, window: &Window) {
         let mv = self.controls.get_movement_vec(
             self.camera.get_current_dir(),
@@ -306,10 +312,20 @@ impl Game {
         }
 
         self.renderer.use_2d_program();
-        self.renderer.set_texture(self.text_2d.texture);
-        self.text_2d.enable_buffers();
-        self.text_2d.draw();
-        self.text_2d.disable_buffers();
+        for m in &mut self.item_handler.sprite_sets {
+            self.renderer.set_texture(m.1.get_texture());
+
+            m.1.enable_buffers();
+
+            for t in &mut m.0 {
+                self.renderer.set_uniform_ortho();
+                self.renderer.set_uniform_offset(t.get_offset());
+                self.renderer.set_uniform_scale2d(t.get_scale());
+                m.1.draw();
+            }
+
+            m.1.disable_buffers();
+        }
     }
 
     pub fn cleanup(&self) {

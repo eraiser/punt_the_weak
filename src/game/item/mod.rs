@@ -8,7 +8,8 @@ use crate::settings::MAX_LIGHTS;
 
 pub mod lighting;
 pub mod mesh;
-mod model;
+mod model_transform;
+mod sprite_transform;
 
 pub mod loader;
 
@@ -22,8 +23,10 @@ an element in model_sets. The key is the file path.
 */
 
 pub struct ItemHandler {
-    pub model_sets: Vec<(Vec<model::ModelTransforms>, mesh::mesh3d::Mesh3D)>,
+    pub model_sets: Vec<(Vec<model_transform::ModelTransforms>, mesh::mesh3d::Mesh3D)>,
     model_map: HashMap<String, usize>,
+    pub sprite_sets: Vec<(Vec<sprite_transform::SpriteTransform>, mesh::mesh2d::Mesh2D)>,
+    sprite_map: HashMap<String, usize>,
     pub light_sorces: Vec<lighting::LightSource>,
 }
 
@@ -31,6 +34,8 @@ pub fn new_item_handler() -> ItemHandler {
     ItemHandler {
         model_sets: Vec::new(),
         model_map: HashMap::new(),
+        sprite_sets: Vec::new(),
+        sprite_map: HashMap::new(),
         light_sorces: Vec::new(),
     }
 }
@@ -40,7 +45,7 @@ impl ItemHandler {
         &mut self,
         collada_path: &str,
         image_path: &str,
-    ) -> &mut model::ModelTransforms {
+    ) -> &mut model_transform::ModelTransforms {
         let contains = self.model_map.get(collada_path);
 
         let i = match contains {
@@ -49,11 +54,11 @@ impl ItemHandler {
                 let transform_vec = Vec::new();
 
                 let mesh_data = loader::load_collada_data(collada_path);
-                let mut mesh = mesh::new_untextured_mesh(mesh_data.0,mesh_data.1,mesh_data.2,mesh_data.3);
+                let mut mesh = mesh::new_untextured_mesh(mesh_data.0, mesh_data.1, mesh_data.2, mesh_data.3);
                 let texture = loader::load_texture(image_path);
                 mesh.set_texture(texture);
 
-                println!("loading");
+                println!("loading:\n {}\n{}",collada_path,image_path);
 
                 self.model_sets.push((transform_vec, mesh));
 
@@ -63,12 +68,37 @@ impl ItemHandler {
             }
         };
 
-        let new_transform = model::new_model_transform();
+        let new_transform = model_transform::new_model_transform();
         self.model_sets[i].0.push(new_transform);
 
         let y = self.model_sets[i].0.len() - 1;
-
         &mut self.model_sets[i].0[y]
+    }
+
+    pub fn add_new_sprite_string(
+        &mut self,
+        text: &str,
+    ) -> &mut sprite_transform::SpriteTransform {
+        let contains = self.model_map.get(text);
+        let i = match contains {
+            Some(x) => *x,
+            None => {
+                let transform_vec = Vec::new();
+
+                let mut sprite = mesh::new_2d_text(text);
+                self.sprite_sets.push((transform_vec, sprite));
+
+                self.sprite_map
+                    .insert(text.to_string(), self.sprite_sets.len() - 1);
+                self.sprite_sets.len() - 1
+            }
+        };
+
+        let new_transform = sprite_transform::new_sprite_transform();
+        self.sprite_sets[i].0.push(new_transform);
+
+        let y = self.sprite_sets[i].0.len() - 1;
+        &mut self.sprite_sets[i].0[y]
     }
 
     pub fn add_light_source(&mut self, light: lighting::LightSource) {
@@ -121,5 +151,6 @@ impl ItemHandler {
 
     pub fn cleanup(&self) {
         self.model_sets.iter().for_each(|e| e.1.cleanup());
+        self.sprite_sets.iter().for_each(|e| e.1.cleanup());
     }
 }

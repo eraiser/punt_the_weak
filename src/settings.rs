@@ -2,6 +2,7 @@
 SETTINGS
 */
 use std::time::Duration;
+use glutin::dpi::LogicalSize;
 
 pub const VSYNC: bool = false;
 
@@ -11,3 +12,5 @@ pub const MCS_PER_UPDATE: Duration = Duration::from_micros(1000000 / TICKS_PER_S
 pub const WINDOW_LABEL: &str = "punt the weak";
 
 pub const MAX_LIGHTS: usize = 4;
+
+pub const START_WINDOWSIZE: LogicalSize = LogicalSize{ width: 960.0, height: 540.0 };

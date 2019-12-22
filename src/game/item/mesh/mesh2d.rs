@@ -2,7 +2,7 @@ use std::ptr;
 
 use gl::types::*;
 
-pub struct Sprite2D {
+pub struct Mesh2D {
     pub texture: gl::types::GLuint,
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
@@ -13,8 +13,8 @@ pub fn new_texture_2d(
     texture: gl::types::GLuint,
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
-    vertex_count: i32)  -> Sprite2D {
-    Sprite2D {
+    vertex_count: i32)  -> Mesh2D {
+    Mesh2D {
         texture,
         vertex_buffer_id,
         uv_buffer_id,
@@ -22,7 +22,7 @@ pub fn new_texture_2d(
     }
 }
 
-impl Sprite2D {
+impl Mesh2D {
 
     pub fn draw(&self) {
         unsafe {
@@ -52,6 +52,13 @@ impl Sprite2D {
             gl::DisableVertexAttribArray(1);
         }
     }
+    pub fn set_texture(&mut self, t: u32) {
+        self.texture = t;
+    }
+    pub fn get_texture(&self) -> u32 {
+        self.texture
+    }
+
 
     pub fn cleanup(&self) {
         unsafe {
