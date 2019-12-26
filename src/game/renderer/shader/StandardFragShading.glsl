@@ -71,14 +71,7 @@ void main(){
 
 
 	}
-
 	//TotalDiffuseColor = max(TotalDiffuseColor, 0.2);
-
-
 	// Ambient : simulates indirect lighting
 	color = vec4(MaterialAmbientColor + TotalDiffuseColor + TotalSpecularColor , 1.0);
-
-
-
-
 }

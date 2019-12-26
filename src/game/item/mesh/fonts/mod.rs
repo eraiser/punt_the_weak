@@ -118,11 +118,19 @@ impl FontData {
             x: 0.0,
             y: 0.0,
         };
+
+        let mut line_counter = 1.0;
+        let mut max_width = 0.0;
+
         for c in string.chars() {
             if c.is_ascii() {
                 if c == '\n' {
+                    if max_width < cursor.x/self.font_height {
+                        max_width = cursor.x/self.font_height;
+                    }
                     cursor.x = 0.0;
                     cursor.y = cursor.y + self.font_height;
+                    line_counter+=1.0;
                     continue;
                 }
                 let code: usize = ((c as u16) - self.start_char) as usize;
@@ -204,7 +212,26 @@ impl FontData {
 
             }
         }
-        (vertices, uvs)
+
+        if max_width < cursor.x/self.font_height {
+            max_width = cursor.x/self.font_height;
+        }
+
+        let mut v_i = vertices.iter_mut();
+
+        let mut i = 0;
+        v_i.for_each(|mut x| {
+            if i%2 > 0 {
+                *x = *x/line_counter;
+                println!("Y: {}",x);
+            }else {
+                *x = *x/max_width;
+                println!("X: {}",x);
+            }
+            i+=1;
+        });
+
+        (vertices,uvs)
     }
 }
 

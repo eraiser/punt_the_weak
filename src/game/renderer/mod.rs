@@ -16,9 +16,9 @@ pub struct Renderer {
     mvp_location: GLint,
     texture_location: GLint,
     o_location: GLint,
-    scale2d_location: GLint,
+    dimensions_location: GLint,
     offset_screenspace_location: GLint,
-    window_dimensions_location: GLint,
+    level_location: GLint,
 }
 
 impl Renderer {
@@ -147,21 +147,21 @@ impl Renderer {
             )
         }
     }
-    pub fn set_window_dimensions(&self, v: Vector2<f32>) {
+    pub fn set_uniform_dimensions(&self, d: Vector2<f32>) {
         unsafe {
             gl::Uniform2fv(
-                self.window_dimensions_location,
+                self.dimensions_location,
                 1,
-                cgmath::conv::array2(v).as_ptr() as *const GLfloat,
+                cgmath::conv::array2(d).as_ptr() as *const GLfloat,
             )
         }
     }
-    pub fn set_uniform_scale2d(&self, s: f32) {
+    pub fn set_uniform_level(&self, f: f32) {
         unsafe {
             gl::Uniform1fv(
-                self.scale2d_location,
+                self.level_location,
                 1,
-                &s as *const GLfloat,
+                &f as *const GLfloat,
             )
         }
     }
@@ -260,7 +260,7 @@ pub fn init_renderer() -> Renderer {
     let scale2d_location: GLint = unsafe {
         gl::GetUniformLocation(
             shader_program_2d,
-            CString::new("scale2d").unwrap().as_ptr(),
+            CString::new("dimensions").unwrap().as_ptr(),
         )
     };
     let offset_screenspace_location: GLint = unsafe {
@@ -269,13 +269,12 @@ pub fn init_renderer() -> Renderer {
             CString::new("offset_screenspace").unwrap().as_ptr(),
         )
     };
-    let window_dimensions_location: GLint = unsafe {
+    let level_location: GLint = unsafe {
         gl::GetUniformLocation(
             shader_program_2d,
-            CString::new("window_dimensions").unwrap().as_ptr(),
+            CString::new("level").unwrap().as_ptr(),
         )
     };
-
     Renderer {
         shader_program_3d,
         perspective_matrix,
@@ -289,8 +288,8 @@ pub fn init_renderer() -> Renderer {
         texture_location,
         shader_program_2d,
         o_location,
-        scale2d_location,
+        dimensions_location: scale2d_location,
         offset_screenspace_location,
-        window_dimensions_location
+        level_location
     }
 }

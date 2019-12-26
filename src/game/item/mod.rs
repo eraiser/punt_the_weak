@@ -79,7 +79,7 @@ impl ItemHandler {
         &mut self,
         text: &str,
     ) -> &mut sprite_transform::SpriteTransform {
-        let contains = self.model_map.get(text);
+        let contains = self.sprite_map.get(text);
         let i = match contains {
             Some(x) => *x,
             None => {

@@ -8,7 +8,8 @@ out vec4 color;
 
 // Values that stay constant for the whole mesh.
 uniform sampler2D myTextureSampler;
+uniform float level;
 
 void main(){
-	color = texture( myTextureSampler, UV );
+	color = texture( myTextureSampler, UV ).rgba;
 }

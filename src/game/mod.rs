@@ -57,7 +57,7 @@ impl Game {
         let speed: f32 = 5.0;
         let mut rng = rand::thread_rng();
 
-        for _x in 0..10 {
+        for _x in 0..1 {
             let r = self.item_handler.add_new_model("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/ball.dae",
                                                     "C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/Untitled.001.png");
             r.translate(Vector3 {
@@ -74,7 +74,7 @@ impl Game {
 
             v = v.normalize();
 
-            r.set_movement_vector(v);
+            //r.set_movement_vector(v);
 
             r.set_rotation_speed_y(PI / 4.0);
         }
@@ -135,9 +135,12 @@ impl Game {
                 },
                 20.0,
             ));
-        let t = self.item_handler.add_new_sprite_string("Hello World\n123");
+        let t = self.item_handler.add_new_sprite_string("Hello World");
+        t.set_offset(Vector2{ x: 0.0, y: 200.0 });
+        t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });
+        let t = self.item_handler.add_new_sprite_string("Hello World\nHello World");
         t.set_offset(Vector2{ x: 100.0, y: 200.0 });
-        t.set_scale(50.0);
+        t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });
     }
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
         use glutin::event::ElementState::*;
@@ -312,15 +315,17 @@ impl Game {
         }
 
         self.renderer.use_2d_program();
+        let mut l = 0.0;
         for m in &mut self.item_handler.sprite_sets {
             self.renderer.set_texture(m.1.get_texture());
 
             m.1.enable_buffers();
-
             for t in &mut m.0 {
                 self.renderer.set_uniform_ortho();
                 self.renderer.set_uniform_offset(t.get_offset());
-                self.renderer.set_uniform_scale2d(t.get_scale());
+                self.renderer.set_uniform_dimensions(t.get_dimensions());
+                self.renderer.set_uniform_level(l);
+                l-=1.0;
                 m.1.draw();
             }
 
