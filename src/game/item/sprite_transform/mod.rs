@@ -3,7 +3,7 @@ use std::f32::consts::PI;
 use cgmath::{Matrix4, Rad, SquareMatrix, Vector2};
 
 pub struct SpriteTransform {
-    rotation_r: Rad<f32>,
+    rotation: Rad<f32>,
     rotation_matrix: Option<Matrix4<f32>>,
     offset: Vector2<f32>,
     dimensions: Vector2<f32>,
@@ -12,7 +12,7 @@ pub struct SpriteTransform {
 pub fn new_sprite_transform() -> SpriteTransform
 {
     SpriteTransform{
-        rotation_r: Rad(0.0),
+        rotation: Rad(0.0),
         rotation_matrix: None,
         offset: Vector2{ x: 0.0, y: 0.0 },
         dimensions: Vector2{ x: 0.0, y: 0.0 }

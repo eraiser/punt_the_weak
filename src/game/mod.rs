@@ -49,99 +49,12 @@ pub fn new_game() -> Game {
         game_mode_changed: true,
     }
 }
-
+mod scene;
 impl Game {
     pub fn load_scene(&mut self) {
-        use rand::Rng;
-
-        let speed: f32 = 5.0;
-        let mut rng = rand::thread_rng();
-
-        for _x in 0..1 {
-            let r = self.item_handler.add_new_model("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/ball.dae",
-                                                    "C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/Untitled.001.png");
-            r.translate(Vector3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            });
-
-            let mut v: Vector3<f32> = Vector3 {
-                x: (rng.gen::<f32>() * speed) - (speed / 2.0),
-                y: (rng.gen::<f32>() * speed) - (speed / 2.0),
-                z: (rng.gen::<f32>() * speed) - (speed / 2.0),
-            };
-
-            v = v.normalize();
-
-            //r.set_movement_vector(v);
-
-            r.set_rotation_speed_y(PI / 4.0);
-        }
-
-        self.item_handler
-            .add_light_source(item::lighting::new_light_source(
-                Vector3 {
-                    x: 5.0,
-                    y: 0.0,
-                    z: 5.0,
-                },
-                Vector3 {
-                    x: 1.0,
-                    y: 0.0,
-                    z: 0.0,
-                },
-                20.0,
-            ));
-        self.item_handler
-            .add_light_source(item::lighting::new_light_source(
-                Vector3 {
-                    x: -5.0,
-                    y: 0.0,
-                    z: 5.0,
-                },
-                Vector3 {
-                    x: 0.0,
-                    y: 1.0,
-                    z: 0.0,
-                },
-                20.0,
-            ));
-        self.item_handler
-            .add_light_source(item::lighting::new_light_source(
-                Vector3 {
-                    x: 5.0,
-                    y: 0.0,
-                    z: -5.0,
-                },
-                Vector3 {
-                    x: 0.0,
-                    y: 0.0,
-                    z: 1.0,
-                },
-                20.0,
-            ));
-        self.item_handler
-            .add_light_source(item::lighting::new_light_source(
-                Vector3 {
-                    x: -5.0,
-                    y: 0.0,
-                    z: -5.0,
-                },
-                Vector3 {
-                    x: 1.0,
-                    y: 1.0,
-                    z: 1.0,
-                },
-                20.0,
-            ));
-        let t = self.item_handler.add_new_sprite_string("Hello World");
-        t.set_offset(Vector2{ x: 0.0, y: 200.0 });
-        t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });
-        let t = self.item_handler.add_new_sprite_string("Hello World\nHello World");
-        t.set_offset(Vector2{ x: 100.0, y: 200.0 });
-        t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });
+        scene::load_scene(self);
     }
+
     pub fn handle_key_inputs(&mut self, input: &KeyboardInput) -> ControlFlow {
         use glutin::event::ElementState::*;
         use glutin::event::VirtualKeyCode::*;
