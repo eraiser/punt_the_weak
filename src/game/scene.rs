@@ -10,8 +10,8 @@ pub fn load_scene(g:&mut Game){
     let mut rng = rand::thread_rng();
 
     for _x in 0..1 {
-        let r = g.item_handler.add_new_model("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/ball.dae",
-                                                "C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/loader/res/Untitled.001.png");
+        let r = g.item_handler.add_new_model("./res/ball.dae",
+                                                "./res/Untitled.001.png");
         r.translate(Vector3 {
             x: 0.0,
             y: 0.0,
@@ -87,9 +87,6 @@ pub fn load_scene(g:&mut Game){
             },
             20.0,
         ));
-    let t = g.item_handler.add_new_sprite_string("Hello World");
-    t.set_offset(Vector2{ x: 0.0, y: 200.0 });
-    t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });
     let t = g.item_handler.add_new_sprite_string("Hello World\nHello World");
     t.set_offset(Vector2{ x: 100.0, y: 200.0 });
     t.set_dimensions(Vector2{ x: 300.0, y: 200.0 });

@@ -51,7 +51,7 @@ pub fn new_2d_text(string: &str) -> mesh2d::Mesh2D {
     let vertex_buffer_id = fill_buffer(vert);
     let uv_buffer_id = fill_buffer(uvs);
 
-    let texture_id = load_texture("C:/Users/krott/Documents/RustProjekt/punt_the_weak/src/game/item/mesh/fonts/ExportedFont.tga");
+    let texture_id = load_texture("./res/fonts/ExportedFont.tga");
 
     mesh2d::new_texture_2d(texture_id, vertex_buffer_id, uv_buffer_id, vertex_count)
 }

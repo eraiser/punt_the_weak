@@ -37,10 +37,12 @@ impl Controls {
             z: 0.0,
         };
 
+        use crate::common_consts::HALF_PI_ROTATION_MATRIX_LEFT;
+
         let mut norm = look_dir;
         norm.y = 0.0;
         norm = norm.normalize();
-        norm = Matrix3::from_angle_y(Rad(std::f32::consts::PI / 2.0)) * norm;
+        norm = *HALF_PI_ROTATION_MATRIX_LEFT * norm;
 
         if self.forward {
             v += look_dir;

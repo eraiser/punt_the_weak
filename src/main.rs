@@ -4,6 +4,8 @@ extern crate glutin;
 extern crate image;
 extern crate rand;
 extern crate rayon;
+#[macro_use]
+extern crate lazy_static;
 
 use glutin::dpi::LogicalPosition;
 
@@ -14,6 +16,8 @@ mod window_utilities;
 
 mod settings;
 
+mod common_consts;
+
 fn main() {
     let (event_loop, windowed_context) = window_utilities::initialize_window(VSYNC);
 
@@ -21,9 +25,11 @@ fn main() {
     game.load_scene();
 
     let mut window_size = windowed_context.window().inner_size();
+    /*
     windowed_context
         .window()
         .set_outer_position(LogicalPosition { x: 0.0, y: 0.0 });
+        */
 
     use std::time::{Duration, Instant};
 
@@ -47,12 +53,12 @@ fn main() {
                     gl::Viewport(0, 0, logical_size.width as i32, logical_size.height as i32);
                 }
             }
+            WindowEvent::KeyboardInput { input, .. } => {
+                *control_flow = game.handle_key_inputs(input);
+            }
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
                 game.cleanup();
-            }
-            WindowEvent::KeyboardInput { input, .. } => {
-                *control_flow = game.handle_key_inputs(input);
             }
             _ => (),
         },

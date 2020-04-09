@@ -60,6 +60,7 @@ impl Camera {
         self.rotation_matrix = None;
         self.current_direction = None;
     }
+    
     pub fn rotate_y(&mut self, angle: f32) {
         self.y_rotation += Rad(angle);
         self.rotation_matrix = None;

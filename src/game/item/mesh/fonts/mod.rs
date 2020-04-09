@@ -33,7 +33,7 @@ impl FontData {
             widths: Vec::new(),
         };
 
-        let csv_file = include_str!("FontData.csv");
+        let csv_file = std::fs::read_to_string("res/fonts/FontData.csv").unwrap();
 
         for line in csv_file.lines() {
             let mut words = line.split(' ');
@@ -223,10 +223,8 @@ impl FontData {
         v_i.for_each(|mut x| {
             if i%2 > 0 {
                 *x = *x/line_counter;
-                println!("Y: {}",x);
             }else {
                 *x = *x/max_width;
-                println!("X: {}",x);
             }
             i+=1;
         });

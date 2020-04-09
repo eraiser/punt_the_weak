@@ -11,11 +11,11 @@ pub struct Renderer {
     light_positions_location: GLint,
     light_colors_location: GLint,
     light_powers_location: GLint,
-    m_location: GLint,
-    v_location: GLint,
+    model_matrix_location: GLint,
+    view_matrix_location: GLint,
     mvp_location: GLint,
     texture_location: GLint,
-    o_location: GLint,
+    orthogonal_matrix_location: GLint,
     dimensions_location: GLint,
     offset_screenspace_location: GLint,
     level_location: GLint,
@@ -74,7 +74,7 @@ impl Renderer {
     pub fn set_uniform_v(&self, m_matrix: Matrix4<f32>) {
         unsafe {
             gl::UniformMatrix4fv(
-                self.v_location,
+                self.view_matrix_location,
                 1,
                 gl::FALSE,
                 cgmath::conv::array4x4(m_matrix).as_ptr() as *const GLfloat,
@@ -84,7 +84,7 @@ impl Renderer {
     pub fn set_uniform_m(&self, v_matrix: Matrix4<f32>) {
         unsafe {
             gl::UniformMatrix4fv(
-                self.m_location,
+                self.model_matrix_location,
                 1,
                 gl::FALSE,
                 cgmath::conv::array4x4(v_matrix).as_ptr() as *const GLfloat,
@@ -131,7 +131,7 @@ impl Renderer {
     pub fn set_uniform_ortho(&self) {
         unsafe {
             gl::UniformMatrix4fv(
-                self.o_location,
+                self.orthogonal_matrix_location,
                 1,
                 gl::FALSE,
                 cgmath::conv::array4x4(self.ortho_matrix).as_ptr() as *const GLfloat,
@@ -223,9 +223,9 @@ pub fn init_renderer() -> Renderer {
     let mvp_location: GLint =
         unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("MVP").unwrap().as_ptr()) };
     let v_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("V").unwrap().as_ptr()) };
+        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("view_matrix").unwrap().as_ptr()) };
     let m_location: GLint =
-        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("M").unwrap().as_ptr()) };
+        unsafe { gl::GetUniformLocation(shader_program_3d, CString::new("model_matrix").unwrap().as_ptr()) };
     let light_positions_location: GLint = unsafe {
         gl::GetUniformLocation(
             shader_program_3d,
@@ -254,7 +254,7 @@ pub fn init_renderer() -> Renderer {
     let o_location: GLint = unsafe {
         gl::GetUniformLocation(
             shader_program_2d,
-            CString::new("O").unwrap().as_ptr(),
+            CString::new("Orthogonal_matrix").unwrap().as_ptr(),
         )
     };
     let scale2d_location: GLint = unsafe {
@@ -282,12 +282,12 @@ pub fn init_renderer() -> Renderer {
         light_positions_location,
         light_colors_location,
         light_powers_location,
-        m_location,
-        v_location,
+        model_matrix_location: m_location,
+        view_matrix_location: v_location,
         mvp_location,
         texture_location,
         shader_program_2d,
-        o_location,
+        orthogonal_matrix_location: o_location,
         dimensions_location: scale2d_location,
         offset_screenspace_location,
         level_location

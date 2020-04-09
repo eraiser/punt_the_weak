@@ -5,6 +5,8 @@ use rayon::iter::ParallelIterator;
 use rayon::prelude::IntoParallelRefMutIterator;
 
 use crate::settings::MAX_LIGHTS;
+use std::cell::RefCell;
+use std::rc::Rc;
 
 pub mod lighting;
 pub mod mesh;
@@ -13,21 +15,12 @@ mod sprite_transform;
 
 pub mod loader;
 
-/*
-model_sets is a Vector that represents models with the same mesh and texture
-that only differ in there transformations and/or motions
-
-model_map is a HashMap that gets a new elements every time a new mesh
-that hasn't been loaded is loaded and keys the index to the loaded element to
-an element in model_sets. The key is the file path.
-*/
-
 pub struct ItemHandler {
-    pub model_sets: Vec<(Vec<model_transform::ModelTransforms>, mesh::mesh3d::Mesh3D)>,
+    pub model_sets: Vec<(Vec<model_transform::ModelTransforms>, mesh::mesh3d::Mesh3D, u32)>,
     model_map: HashMap<String, usize>,
     pub sprite_sets: Vec<(Vec<sprite_transform::SpriteTransform>, mesh::mesh2d::Mesh2D)>,
     sprite_map: HashMap<String, usize>,
-    pub light_sorces: Vec<lighting::LightSource>,
+    pub light_sources: Vec<lighting::LightSource>,
 }
 
 pub fn new_item_handler() -> ItemHandler {
@@ -36,7 +29,7 @@ pub fn new_item_handler() -> ItemHandler {
         model_map: HashMap::new(),
         sprite_sets: Vec::new(),
         sprite_map: HashMap::new(),
-        light_sorces: Vec::new(),
+        light_sources: Vec::new(),
     }
 }
 
@@ -46,9 +39,8 @@ impl ItemHandler {
         collada_path: &str,
         image_path: &str,
     ) -> &mut model_transform::ModelTransforms {
-        let contains = self.model_map.get(collada_path);
 
-        let i = match contains {
+        let i = match self.model_map.get(collada_path) {
             Some(x) => *x,
             None => {
                 let transform_vec = Vec::new();
@@ -60,7 +52,7 @@ impl ItemHandler {
 
                 println!("loading:\n {}\n{}",collada_path,image_path);
 
-                self.model_sets.push((transform_vec, mesh));
+                self.model_sets.push((transform_vec, mesh, 3));
 
                 self.model_map
                     .insert(collada_path.to_string(), self.model_sets.len() - 1);
@@ -102,7 +94,7 @@ impl ItemHandler {
     }
 
     pub fn add_light_source(&mut self, light: lighting::LightSource) {
-        self.light_sorces.push(light);
+        self.light_sources.push(light);
     }
 
     pub fn get_nearest_light_data(
@@ -126,9 +118,9 @@ impl ItemHandler {
         let mut pow: [f32; MAX_LIGHTS] = [0.0, 0.0, 0.0, 0.0];
 
         for i in 0..MAX_LIGHTS {
-            pos[i] = self.light_sorces[i].translation;
-            col[i] = self.light_sorces[i].color;
-            pow[i] = self.light_sorces[i].power;
+            pos[i] = self.light_sources[i].translation;
+            col[i] = self.light_sources[i].color;
+            pow[i] = self.light_sources[i].power;
         }
 
         return (pos, col, pow);
@@ -137,13 +129,13 @@ impl ItemHandler {
     pub fn update(&mut self) {
         self.model_sets
             .par_iter_mut()
-            .for_each({ |s| s.0.par_iter_mut().for_each(|m| m.update()) });
+            .for_each({ |s| s.0.iter_mut().for_each(|m| m.update()) });
     }
 
     pub fn calc_intp_modelmatrices(&mut self, i_v: f32) {
         self.model_sets.par_iter_mut().for_each({
             |s| {
-                s.0.par_iter_mut()
+                s.0.iter_mut()
                     .for_each(|m| m.calc_intp_model_matrix(i_v))
             }
         })

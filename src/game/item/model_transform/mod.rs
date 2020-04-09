@@ -38,7 +38,7 @@ pub fn new_model_transform() -> ModelTransforms {
     }
 }
 
-pub const TWO_PI: Rad<f32> = Rad(2.0 * PI);
+
 
 impl ModelTransforms {
     pub fn rotate_x(&mut self, angle: f32) {
@@ -80,6 +80,7 @@ impl ModelTransforms {
     }
 
     fn trim_angel(&mut self) {
+        use crate::common_consts::TWO_PI;
         if self.rotation_x > TWO_PI {
             self.rotation_x -= TWO_PI
         }
@@ -143,6 +144,11 @@ impl ModelTransforms {
     pub fn get_current_model_matrix(&self) -> Matrix4<f32> {
         self.current_model_matrix
     }
+
+    pub fn calc_intp_model_matrix(&mut self, i_v: f32) {
+        self.current_model_matrix = self.get_intp_model_matrix(i_v);
+    }
+
     pub fn get_intp_model_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
         let rotation = self.get_intr_rotation_matrix(i_v);
         let translation = self.get_intr_translation_matrix(i_v);
@@ -150,11 +156,10 @@ impl ModelTransforms {
         translation * rotation * scale
     }
 
-    pub fn calc_intp_model_matrix(&mut self, i_v: f32) {
-        self.current_model_matrix = self.get_intp_model_matrix(i_v);
-    }
-
     fn get_intr_rotation_matrix(&mut self, i_v: f32) -> Matrix4<f32> {
+
+        //TODO: Cleanup inefficiency
+
         use crate::settings::TICKS_PER_SECOND as tps;
         if self.motion.is_rotating() {
             let r_x = cgmath::Matrix4::from_angle_x(
