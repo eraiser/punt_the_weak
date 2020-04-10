@@ -4,6 +4,15 @@ use std::f32::consts::PI;
 
 pub fn load_scene(g:&mut Game){
 
+    let mut plain = g.item_handler.add_new_model("./res/plain.dae",
+                                 "./res/Untitled.002.png");
+    plain.rotate_x(PI/2.0);
+    plain.translate(Vector3{
+        x: -5.0,
+        y: -2.0,
+        z: -5.0
+    });
+    plain.scale(5.0);
     use rand::Rng;
 
     let speed: f32 = 5.0;
