@@ -8,6 +8,7 @@ extern crate rayon;
 extern crate lazy_static;
 
 use glutin::dpi::LogicalPosition;
+use glutin::dpi::PhysicalSize;
 
 use settings::*;
 
@@ -40,8 +41,6 @@ fn main() {
     event_loop.run(move |event, _, control_flow| match event {
         Event::WindowEvent { ref event, .. } => match event {
             WindowEvent::Resized(logical_size) => {
-                let dpi_factor = windowed_context.window().hidpi_factor();
-                windowed_context.resize(logical_size.to_physical(dpi_factor));
                 window_size = *logical_size;
                 game.handle_screen_resolution_change(window_size.width as f32,window_size.height as f32);
                 unsafe {
@@ -60,14 +59,14 @@ fn main() {
 
         Event::DeviceEvent { ref event, .. } => match event {
             DeviceEvent::MouseMotion { delta } => {
-                let x_movement = delta.0 / window_size.width;
-                let y_movement = delta.1 / window_size.height;
+                let x_movement = delta.0 / window_size.width as f64;
+                let y_movement = delta.1 / window_size.height as f64;
                 game.handle_cursor_movement(x_movement as f32, y_movement as f32);
             }
             _ => (),
         },
 
-        Event::EventsCleared => {
+        Event::MainEventsCleared => {
             if *control_flow != ControlFlow::Exit {
                 let current = game_time.elapsed();
                 let elapsed = current - previous;

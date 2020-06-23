@@ -13,4 +13,4 @@ pub const WINDOW_LABEL: &str = "punt the weak";
 
 pub const MAX_LIGHTS: usize = 4;
 
-pub const START_WINDOWSIZE: LogicalSize = LogicalSize{ width: 960.0, height: 540.0 };
+pub const START_WINDOWSIZE: LogicalSize<f64> = LogicalSize{ width: 960.0, height: 540.0 };

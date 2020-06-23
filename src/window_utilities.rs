@@ -8,7 +8,7 @@ use glutin::dpi::LogicalSize;
 use crate::settings;
 
 pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<PossiblyCurrent, Window>) {
-    let event_loop = glutin::event_loop::EventLoop::new_user_event();
+    let event_loop = glutin::event_loop::EventLoop::new();
     let wb = glutin::window::WindowBuilder::new().with_title(settings::WINDOW_LABEL).with_inner_size(settings::START_WINDOWSIZE);
     let context = glutin::ContextBuilder::new()
         .with_vsync(vsync)
