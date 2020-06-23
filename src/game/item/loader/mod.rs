@@ -47,7 +47,7 @@ pub fn load_texture(path: &str) -> u32 {
     texture
 }
 
-pub fn load_collada_data(path: &str) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
+pub fn load_collada_data(path: &str) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
     let path = Path::new(path);
 
     let doc = collada::document::ColladaDocument::from_path(path).unwrap();
@@ -80,13 +80,11 @@ fn fill_vnt_vectors(
     texture_data_indexed: &Vec<TVertex>,
     normals_indexed: &Vec<Vertex>,
     indices: &Triangles,
-) -> (Vec<f32>, Vec<f32>, Vec<f32>, Vec<i16>) {
+) -> (Vec<f32>, Vec<f32>, Vec<f32>) {
     let mut vert = Vec::new();
     let mut tex = Vec::new();
     let mut norm = Vec::new();
 
-    let mut int = Vec::new();
-    let mut i = 0;
 
     for triangle in indices.vertices.iter() {
         let vtn_i = triangle.0;
@@ -131,11 +129,7 @@ fn fill_vnt_vectors(
         norm.push(normals_indexed[n_i_2].y as f32);
         norm.push(normals_indexed[n_i_2].z as f32);
 
-        int.push(i);
-        int.push(i + 1);
-        int.push(i + 2);
-        i += 3;
     }
 
-    (vert, norm, tex, int)
+    (vert, norm, tex)
 }

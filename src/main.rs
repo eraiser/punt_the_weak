@@ -25,11 +25,6 @@ fn main() {
     game.load_scene();
 
     let mut window_size = windowed_context.window().inner_size();
-    /*
-    windowed_context
-        .window()
-        .set_outer_position(LogicalPosition { x: 0.0, y: 0.0 });
-        */
 
     use std::time::{Duration, Instant};
 
@@ -73,7 +68,7 @@ fn main() {
         },
 
         Event::EventsCleared => {
-            if control_flow != &ControlFlow::Exit {
+            if *control_flow != ControlFlow::Exit {
                 let current = game_time.elapsed();
                 let elapsed = current - previous;
                 previous = current;

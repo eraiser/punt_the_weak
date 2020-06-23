@@ -8,7 +8,6 @@ pub struct Mesh3D {
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
     normal_buffer_id: gl::types::GLuint,
-    element_buffer_id: gl::types::GLuint,
     vertex_count: i32,
 }
 
@@ -17,7 +16,6 @@ pub fn new_mesh_3d(
     vertex_buffer_id: gl::types::GLuint,
     uv_buffer_id: gl::types::GLuint,
     normal_buffer_id: gl::types::GLuint,
-    element_buffer_id: gl::types::GLuint,
     vertex_count: i32,) -> Mesh3D {
     Mesh3D{
         texture: 0,
@@ -25,7 +23,6 @@ pub fn new_mesh_3d(
         vertex_buffer_id,
         uv_buffer_id,
         normal_buffer_id,
-        element_buffer_id,
         vertex_count
     }
 }
@@ -33,11 +30,10 @@ pub fn new_mesh_3d(
 impl Mesh3D {
     pub fn draw(&self) {
         unsafe {
-            gl::DrawElements(
+            gl::DrawArrays(
                 gl::TRIANGLES,
+                0,
                 self.vertex_count,
-                gl::UNSIGNED_SHORT,
-                ptr::null(),
             );
         }
     }
@@ -55,8 +51,6 @@ impl Mesh3D {
             gl::EnableVertexAttribArray(2);
             gl::BindBuffer(gl::ARRAY_BUFFER, self.uv_buffer_id);
             gl::VertexAttribPointer(2, 2, gl::FLOAT, gl::FALSE as GLboolean, 0, ptr::null());
-
-            gl::BindBuffer(gl::ELEMENT_ARRAY_BUFFER, self.element_buffer_id);
         }
     }
 

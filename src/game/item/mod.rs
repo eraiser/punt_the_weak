@@ -46,7 +46,7 @@ impl ItemHandler {
                 let transform_vec = Vec::new();
 
                 let mesh_data = loader::load_collada_data(collada_path);
-                let mut mesh = mesh::new_untextured_mesh(mesh_data.0, mesh_data.1, mesh_data.2, mesh_data.3);
+                let mut mesh = mesh::new_untextured_mesh(mesh_data.0, mesh_data.1, mesh_data.2);
                 let texture = loader::load_texture(image_path);
                 mesh.set_texture(texture);
 
