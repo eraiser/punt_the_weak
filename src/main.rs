@@ -59,9 +59,9 @@ fn main() {
 
         Event::DeviceEvent { ref event, .. } => match event {
             DeviceEvent::MouseMotion { delta } => {
-                let x_movement = delta.0 / window_size.width as f64;
-                let y_movement = delta.1 / window_size.height as f64;
-                game.handle_cursor_movement(x_movement as f32, y_movement as f32);
+                let x_movement = delta.0  as f32 / window_size.width as f32;
+                let y_movement = delta.1  as f32/ window_size.height as f32;
+                game.handle_cursor_movement(x_movement, y_movement);
             }
             _ => (),
         },

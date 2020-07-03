@@ -7,16 +7,18 @@ use rayon::prelude::IntoParallelRefMutIterator;
 use crate::settings::MAX_LIGHTS;
 use std::cell::RefCell;
 use std::rc::Rc;
+use crate::game::item::model::motion::Motion;
+use std::borrow::BorrowMut;
 
 pub mod lighting;
 pub mod mesh;
-mod model_transform;
+pub mod model;
 mod sprite_transform;
 
 pub mod loader;
 
 pub struct ItemHandler {
-    pub model_sets: Vec<(Vec<model_transform::ModelTransforms>, mesh::mesh3d::Mesh3D, u32)>,
+    pub model_sets: Vec<(Vec<model::Model>, mesh::mesh3d::Mesh3D)>,
     model_map: HashMap<String, usize>,
     pub sprite_sets: Vec<(Vec<sprite_transform::SpriteTransform>, mesh::mesh2d::Mesh2D)>,
     sprite_map: HashMap<String, usize>,
@@ -38,7 +40,7 @@ impl ItemHandler {
         &mut self,
         collada_path: &str,
         image_path: &str,
-    ) -> &mut model_transform::ModelTransforms {
+    ) -> &mut model::Model {
 
         let i = match self.model_map.get(collada_path) {
             Some(x) => *x,
@@ -52,7 +54,7 @@ impl ItemHandler {
 
                 println!("loading:\n {}\n{}",collada_path,image_path);
 
-                self.model_sets.push((transform_vec, mesh, 3));
+                self.model_sets.push((transform_vec, mesh));
 
                 self.model_map
                     .insert(collada_path.to_string(), self.model_sets.len() - 1);
@@ -60,8 +62,8 @@ impl ItemHandler {
             }
         };
 
-        let new_transform = model_transform::new_model_transform();
-        self.model_sets[i].0.push(new_transform);
+        let new_model = model::new_model();
+        self.model_sets[i].0.push(new_model);
 
         let y = self.model_sets[i].0.len() - 1;
         &mut self.model_sets[i].0[y]
@@ -127,16 +129,18 @@ impl ItemHandler {
     }
 
     pub fn update(&mut self) {
+
         self.model_sets
             .par_iter_mut()
             .for_each({ |s| s.0.iter_mut().for_each(|m| m.update()) });
+
     }
 
     pub fn calc_intp_modelmatrices(&mut self, i_v: f32) {
         self.model_sets.par_iter_mut().for_each({
             |s| {
                 s.0.iter_mut()
-                    .for_each(|m| m.calc_intp_model_matrix(i_v))
+                    .for_each(|m| m.calc_model_matrix(i_v))
             }
         })
     }
