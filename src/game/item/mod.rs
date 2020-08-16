@@ -7,8 +7,8 @@ use rayon::prelude::IntoParallelRefMutIterator;
 use crate::settings::MAX_LIGHTS;
 use std::cell::RefCell;
 use std::rc::Rc;
-use crate::game::item::model::motion::Motion;
 use std::borrow::BorrowMut;
+use model::Model;
 
 pub mod lighting;
 pub mod mesh;
@@ -67,6 +67,11 @@ impl ItemHandler {
 
         let y = self.model_sets[i].0.len() - 1;
         &mut self.model_sets[i].0[y]
+    }
+
+    pub fn get_model(&mut self, i:usize) -> &mut Model{
+        let ms = self.model_sets.get_mut(1).unwrap();
+        ms.0.get_mut(i).unwrap()
     }
 
     pub fn add_new_sprite_string(

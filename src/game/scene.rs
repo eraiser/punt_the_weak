@@ -2,6 +2,8 @@ use crate::game::{Game, item};
 use cgmath::{Vector3, InnerSpace, Vector2, Rad, Quaternion,Rotation3};
 use std::f32::consts::PI;
 use item::model::motion;
+use crate::game::item::model::motion::MotionType::q_to_q;
+use crate::game::item::model::motion::MotionType;
 
 pub fn load_scene(g:&mut Game){
 
@@ -17,14 +19,23 @@ pub fn load_scene(g:&mut Game){
     plain.calc_model_matrix(0.0);
 
 
-    for _x in 0..1 {
-        let r = g.item_handler.add_new_model(   "./res/ball.dae",
-                                                            "./res/Untitled.001.png");
-        r.transform.rotate_y(Rad(PI/2.0));
-        let mut ts = motion::new_motion();
-        ts.rotation_per_sec = Rotation3::from_angle_y(Rad(std::f32::consts::PI/100.0));
-        r.motion = Some(ts);
-    }
+    let r = g.item_handler.add_new_model(   "./res/ball.dae",
+                                                        "./res/Untitled.001.png");
+    r.transform.rotate_z(Rad(PI/2.0));
+    r.transform.translation = Vector3::new(0.0,0.0,0.0);
+
+    let mut ts = motion::new_q_to_q_motion();
+    r.motion = Some(MotionType::q_to_q(ts));
+
+    let r = g.item_handler.add_new_model(   "./res/untitled.dae",
+                                                        "./res/Untitled.001.png");
+    r.transform.rotate_x(Rad(3.0*PI/2.0));
+    r.transform.translation = Vector3::new(5.0,0.0,0.0);
+
+
+    let mut ts = motion::new_continuous_motion();
+    ts.set_rotation_per_sec_y(Rad(std::f32::consts::PI/3.0));
+    r.motion = Some(MotionType::continuous(ts));
 
     g.item_handler
         .add_light_source(item::lighting::new_light_source(

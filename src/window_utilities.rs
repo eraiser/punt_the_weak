@@ -24,10 +24,12 @@ pub fn initialize_window(vsync: bool) -> (EventLoop<()>, ContextWrapper<Possibly
     unsafe {
         gl::Enable(gl::DEPTH_TEST);
         gl::DepthFunc(gl::LESS);
+
+        //gl::Enable(gl::CULL_FACE);
+        //gl::CullFace(gl::BACK);
+
         gl::Enable(gl::BLEND);
         gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
-        //gl::BlendFunc(gl::ONE, gl::ONE_MINUS_SRC_ALPHA);
-        //gl::PolygonMode( gl::FRONT_AND_BACK, gl::LINE );
     }
     (event_loop, windowed_context)
 }

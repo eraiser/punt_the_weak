@@ -19,7 +19,12 @@ mod settings;
 
 mod common_consts;
 
+mod esp_mpu_handler;
+
+
 fn main() {
+    esp_mpu_handler::start_ct();
+
     let (event_loop, windowed_context) = window_utilities::initialize_window(VSYNC);
 
     let mut game = game::new_game();
@@ -53,6 +58,7 @@ fn main() {
             WindowEvent::CloseRequested => {
                 *control_flow = ControlFlow::Exit;
                 game.cleanup();
+                esp_mpu_handler::shut_down();
             }
             _ => (),
         },

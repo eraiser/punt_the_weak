@@ -7,6 +7,10 @@ use glutin::window::Window;
 
 use crate::game::GameMode::Menu;
 use crate::settings::*;
+use std::borrow::BorrowMut;
+use std::sync::atomic::{AtomicBool, Ordering};
+use crate::esp_mpu_handler;
+use crate::game::item::model::motion::MotionType;
 
 mod renderer;
 
@@ -50,6 +54,8 @@ pub fn new_game() -> Game {
     }
 }
 mod scene;
+
+static q_pressed:AtomicBool = AtomicBool::new(false);
 impl Game {
     pub fn load_scene(&mut self) {
         scene::load_scene(self);
@@ -62,6 +68,9 @@ impl Game {
         match input.virtual_keycode {
             Some(key) => match self.game_mode {
                 GameMode::Playing => match key {
+                    Q => {
+                        q_pressed.swap(true,Ordering::Relaxed);
+                    }
                     W => {
                         if input.state == Pressed {
                             self.controls.forward = true
@@ -165,6 +174,7 @@ impl Game {
     }
 
     pub fn update(&mut self, window: &Window) {
+        use cgmath::{Rotation3,Rad,Quaternion};
         let mv = self.controls.get_movement_vec(
             self.camera.get_current_dir(),
             self.camera.get_speed() / TICKS_PER_SECOND as f32,
@@ -172,6 +182,28 @@ impl Game {
         self.camera.move_dir(mv);
 
         self.item_handler.update();
+
+
+        let model = self.item_handler.get_model(0);
+        match esp_mpu_handler::get_value(0) {
+            Some(f)=> {
+
+                match model.motion.borrow_mut() {
+                    Some(m) => {
+                        match m {
+                            MotionType::q_to_q(q) => {
+                                let r = Quaternion::new(f.0,f.1,f.2,f.3);
+                                q.target_quaternion = r;
+                            },
+                            _ => ()
+                        }
+                    },
+                    None => ()
+                }
+
+            }
+            None => println!("no update")
+        }
 
         if self.game_mode_changed {
             match self.game_mode {
